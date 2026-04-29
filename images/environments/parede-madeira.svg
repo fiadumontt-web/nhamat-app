@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+      <defs>
+        <linearGradient id="wood1" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#8B6338"/>
+          <stop offset="50%" style="stop-color:#6B4A20"/>
+          <stop offset="100%" style="stop-color:#7a5530"/>
+        </linearGradient>
+        <linearGradient id="wood2" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#7a5530"/>
+          <stop offset="100%" style="stop-color:#5a3d1a"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="500" fill="#8B6338"/>
+      <!-- Vertical wood planks -->
+      <rect x="0" y="0" width="80" height="420" fill="url(#wood1)"/>
+      <rect x="80" y="0" width="80" height="420" fill="url(#wood2)"/>
+      <rect x="160" y="0" width="80" height="420" fill="url(#wood1)"/>
+      <rect x="240" y="0" width="80" height="420" fill="url(#wood2)"/>
+      <rect x="320" y="0" width="80" height="420" fill="url(#wood1)"/>
+      <rect x="400" y="0" width="80" height="420" fill="url(#wood2)"/>
+      <rect x="480" y="0" width="80" height="420" fill="url(#wood1)"/>
+      <rect x="560" y="0" width="80" height="420" fill="url(#wood2)"/>
+      <rect x="640" y="0" width="80" height="420" fill="url(#wood1)"/>
+      <rect x="720" y="0" width="80" height="420" fill="url(#wood2)"/>
+      <!-- Grain lines -->
+      <line x1="0" y1="120" x2="80" y2="115" stroke="#5a3d1a" stroke-width="0.5" opacity="0.5"/>
+      <line x1="160" y1="200" x2="240" y2="195" stroke="#5a3d1a" stroke-width="0.5" opacity="0.5"/>
+      <!-- Plank borders -->
+      <line x1="80" y1="0" x2="80" y2="420" stroke="#3d2800" stroke-width="1.5"/>
+      <line x1="160" y1="0" x2="160" y2="420" stroke="#3d2800" stroke-width="1.5"/>
+      <line x1="240" y1="0" x2="240" y2="420" stroke="#3d2800" stroke-width="1.5"/>
+      <line x1="320" y1="0" x2="320" y2="420" stroke="#3d2800" stroke-width="1.5"/>
+      <line x1="400" y1="0" x2="400" y2="420" stroke="#3d2800" stroke-width="1.5"/>
+      <line x1="480" y1="0" x2="480" y2="420" stroke="#3d2800" stroke-width="1.5"/>
+      <line x1="560" y1="0" x2="560" y2="420" stroke="#3d2800" stroke-width="1.5"/>
+      <line x1="640" y1="0" x2="640" y2="420" stroke="#3d2800" stroke-width="1.5"/>
+      <line x1="720" y1="0" x2="720" y2="420" stroke="#3d2800" stroke-width="1.5"/>
+      <!-- Floor -->
+      <rect x="0" y="420" width="800" height="80" fill="#5a3d1a"/>
+      <line x1="0" y1="420" x2="800" y2="420" stroke="#3d2800" stroke-width="2"/>
+    </svg>

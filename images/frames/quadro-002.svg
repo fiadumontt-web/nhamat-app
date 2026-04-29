@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 300 400" width="300" height="400">
+      <defs>
+        <linearGradient id="bg2" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#0d1a0d"/>
+          <stop offset="100%" style="stop-color:#1a2e1a"/>
+        </linearGradient>
+      </defs>
+      <rect x="0" y="0" width="300" height="400" fill="#1a2e0d"/>
+      <rect x="12" y="12" width="276" height="376" fill="#0d1a07"/>
+      <rect x="20" y="20" width="260" height="360" fill="url(#bg2)"/>
+      <!-- Stem -->
+      <path d="M150,380 Q145,300 155,200 Q160,150 150,80" stroke="#2d5a1b" stroke-width="3" fill="none"/>
+      <!-- Leaves -->
+      <path d="M150,280 Q90,240 60,200 Q100,210 150,280 Z" fill="#2d6b1f" opacity="0.8"/>
+      <path d="M150,280 Q210,240 240,200 Q200,210 150,280 Z" fill="#3a8026" opacity="0.8"/>
+      <path d="M152,200 Q85,160 55,120 Q100,135 152,200 Z" fill="#2d6b1f" opacity="0.7"/>
+      <path d="M152,200 Q215,160 245,120 Q200,135 152,200 Z" fill="#3a8026" opacity="0.7"/>
+      <path d="M150,130 Q110,90 90,60 Q130,80 150,130 Z" fill="#4a9632" opacity="0.6"/>
+      <path d="M150,130 Q190,90 210,60 Q170,80 150,130 Z" fill="#3a8026" opacity="0.6"/>
+      <!-- Flower top -->
+      <circle cx="150" cy="70" r="20" fill="#C9930A" opacity="0.9"/>
+      <circle cx="150" cy="70" r="12" fill="#E8B020"/>
+      <rect x="20" y="20" width="260" height="360" fill="none" stroke="#2d5a1b" stroke-width="2" opacity="0.5"/>
+    </svg>

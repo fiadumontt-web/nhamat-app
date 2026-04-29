@@ -1,0 +1,41 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+      <defs>
+        <linearGradient id="room2wall" x1="0%" y1="0%" x2="0%" y2="100%">
+          <stop offset="0%" style="stop-color:#f8f5f0"/>
+          <stop offset="100%" style="stop-color:#ede8e0"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="500" fill="url(#room2wall)"/>
+      <!-- Backsplash tiles -->
+      <rect x="0" y="200" width="800" height="120" fill="#e8e0d8"/>
+      <g stroke="#d0c8c0" stroke-width="0.5" fill="none">
+        <rect x="0" y="200" width="40" height="24"/><rect x="40" y="200" width="40" height="24"/><rect x="80" y="200" width="40" height="24"/><rect x="120" y="200" width="40" height="24"/><rect x="160" y="200" width="40" height="24"/><rect x="200" y="200" width="40" height="24"/><rect x="240" y="200" width="40" height="24"/><rect x="280" y="200" width="40" height="24"/><rect x="320" y="200" width="40" height="24"/><rect x="360" y="200" width="40" height="24"/><rect x="400" y="200" width="40" height="24"/><rect x="440" y="200" width="40" height="24"/><rect x="480" y="200" width="40" height="24"/><rect x="520" y="200" width="40" height="24"/><rect x="560" y="200" width="40" height="24"/><rect x="600" y="200" width="40" height="24"/><rect x="640" y="200" width="40" height="24"/><rect x="680" y="200" width="40" height="24"/><rect x="720" y="200" width="40" height="24"/><rect x="760" y="200" width="40" height="24"/><rect x="0" y="224" width="40" height="24"/><rect x="40" y="224" width="40" height="24"/><rect x="80" y="224" width="40" height="24"/><rect x="120" y="224" width="40" height="24"/><rect x="160" y="224" width="40" height="24"/><rect x="200" y="224" width="40" height="24"/><rect x="240" y="224" width="40" height="24"/><rect x="280" y="224" width="40" height="24"/><rect x="320" y="224" width="40" height="24"/><rect x="360" y="224" width="40" height="24"/><rect x="400" y="224" width="40" height="24"/><rect x="440" y="224" width="40" height="24"/><rect x="480" y="224" width="40" height="24"/><rect x="520" y="224" width="40" height="24"/><rect x="560" y="224" width="40" height="24"/><rect x="600" y="224" width="40" height="24"/><rect x="640" y="224" width="40" height="24"/><rect x="680" y="224" width="40" height="24"/><rect x="720" y="224" width="40" height="24"/><rect x="760" y="224" width="40" height="24"/><rect x="0" y="248" width="40" height="24"/><rect x="40" y="248" width="40" height="24"/><rect x="80" y="248" width="40" height="24"/><rect x="120" y="248" width="40" height="24"/><rect x="160" y="248" width="40" height="24"/><rect x="200" y="248" width="40" height="24"/><rect x="240" y="248" width="40" height="24"/><rect x="280" y="248" width="40" height="24"/><rect x="320" y="248" width="40" height="24"/><rect x="360" y="248" width="40" height="24"/><rect x="400" y="248" width="40" height="24"/><rect x="440" y="248" width="40" height="24"/><rect x="480" y="248" width="40" height="24"/><rect x="520" y="248" width="40" height="24"/><rect x="560" y="248" width="40" height="24"/><rect x="600" y="248" width="40" height="24"/><rect x="640" y="248" width="40" height="24"/><rect x="680" y="248" width="40" height="24"/><rect x="720" y="248" width="40" height="24"/><rect x="760" y="248" width="40" height="24"/><rect x="0" y="272" width="40" height="24"/><rect x="40" y="272" width="40" height="24"/><rect x="80" y="272" width="40" height="24"/><rect x="120" y="272" width="40" height="24"/><rect x="160" y="272" width="40" height="24"/><rect x="200" y="272" width="40" height="24"/><rect x="240" y="272" width="40" height="24"/><rect x="280" y="272" width="40" height="24"/><rect x="320" y="272" width="40" height="24"/><rect x="360" y="272" width="40" height="24"/><rect x="400" y="272" width="40" height="24"/><rect x="440" y="272" width="40" height="24"/><rect x="480" y="272" width="40" height="24"/><rect x="520" y="272" width="40" height="24"/><rect x="560" y="272" width="40" height="24"/><rect x="600" y="272" width="40" height="24"/><rect x="640" y="272" width="40" height="24"/><rect x="680" y="272" width="40" height="24"/><rect x="720" y="272" width="40" height="24"/><rect x="760" y="272" width="40" height="24"/><rect x="0" y="296" width="40" height="24"/><rect x="40" y="296" width="40" height="24"/><rect x="80" y="296" width="40" height="24"/><rect x="120" y="296" width="40" height="24"/><rect x="160" y="296" width="40" height="24"/><rect x="200" y="296" width="40" height="24"/><rect x="240" y="296" width="40" height="24"/><rect x="280" y="296" width="40" height="24"/><rect x="320" y="296" width="40" height="24"/><rect x="360" y="296" width="40" height="24"/><rect x="400" y="296" width="40" height="24"/><rect x="440" y="296" width="40" height="24"/><rect x="480" y="296" width="40" height="24"/><rect x="520" y="296" width="40" height="24"/><rect x="560" y="296" width="40" height="24"/><rect x="600" y="296" width="40" height="24"/><rect x="640" y="296" width="40" height="24"/><rect x="680" y="296" width="40" height="24"/><rect x="720" y="296" width="40" height="24"/><rect x="760" y="296" width="40" height="24"/>
+      </g>
+      <!-- Counter -->
+      <rect x="0" y="316" width="800" height="184" fill="#2a2a2a"/>
+      <rect x="0" y="316" width="800" height="20" fill="#1a1a1a"/>
+      <!-- Counter top marble -->
+      <rect x="0" y="316" width="800" height="20" fill="#f0ece8"/>
+      <path d="M50,320 Q200,318 350,323 Q500,328 650,320" stroke="#d0c8c0" stroke-width="0.5" fill="none" opacity="0.5"/>
+      <!-- Cabinet doors -->
+      <rect x="10" y="320" width="120" height="150" rx="2" fill="#1e1e1e" stroke="#333" stroke-width="1"/>
+      <rect x="140" y="320" width="120" height="150" rx="2" fill="#1e1e1e" stroke="#333" stroke-width="1"/>
+      <rect x="270" y="320" width="120" height="150" rx="2" fill="#1e1e1e" stroke="#333" stroke-width="1"/>
+      <rect x="400" y="320" width="120" height="150" rx="2" fill="#1e1e1e" stroke="#333" stroke-width="1"/>
+      <rect x="530" y="320" width="120" height="150" rx="2" fill="#1e1e1e" stroke="#333" stroke-width="1"/>
+      <rect x="660" y="320" width="130" height="150" rx="2" fill="#1e1e1e" stroke="#333" stroke-width="1"/>
+      <!-- Cabinet handles gold -->
+      <rect x="64" y="390" width="20" height="4" rx="2" fill="#C9930A"/>
+      <rect x="194" y="390" width="20" height="4" rx="2" fill="#C9930A"/>
+      <rect x="324" y="390" width="20" height="4" rx="2" fill="#C9930A"/>
+      <rect x="454" y="390" width="20" height="4" rx="2" fill="#C9930A"/>
+      <rect x="584" y="390" width="20" height="4" rx="2" fill="#C9930A"/>
+      <rect x="714" y="390" width="20" height="4" rx="2" fill="#C9930A"/>
+      <!-- Wall cabinets -->
+      <rect x="0" y="50" width="200" height="140" rx="2" fill="#1e1e1e" stroke="#333" stroke-width="1"/>
+      <rect x="210" y="50" width="200" height="140" rx="2" fill="#1e1e1e" stroke="#333" stroke-width="1"/>
+      <rect x="600" y="50" width="200" height="140" rx="2" fill="#1e1e1e" stroke="#333" stroke-width="1"/>
+      <rect x="64" y="118" width="20" height="4" rx="2" fill="#C9930A"/>
+      <rect x="274" y="118" width="20" height="4" rx="2" fill="#C9930A"/>
+      <rect x="664" y="118" width="20" height="4" rx="2" fill="#C9930A"/>
+    </svg>

@@ -1,0 +1,1207 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NHAMAT — Óculos &amp; Quadros Decorativos</title>
+<meta name="description" content="NHAMAT — Óculos com try-on ao vivo e quadros decorativos com simulador de ambiente."/>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Jost:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/face_mesh.js" crossorigin="anonymous"></script>
+<style>
+:root{
+  --gold:#C9930A;--gold-l:#E8B020;--gold-d:#8a6308;--gold-p:#f5e6b8;
+  --black:#080808;--dark:#0f0f0f;--panel:#161616;--panel2:#1e1e1e;
+  --border:#242424;--border2:#2e2e2e;--text:#f0e6cc;--muted:#888;--dim:#555;
+  --r:2px;--tr:.25s cubic-bezier(.4,0,.2,1);--sh:0 8px 40px rgba(0,0,0,.6);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{background:var(--black);color:var(--text);font-family:'Jost',sans-serif;font-weight:300;line-height:1.6;-webkit-font-smoothing:antialiased;overflow-x:hidden;}
+h1,h2,h3,h4{font-family:'Cormorant Garamond',serif;font-weight:300;line-height:1.1;}
+::-webkit-scrollbar{width:4px;}::-webkit-scrollbar-track{background:var(--black);}::-webkit-scrollbar-thumb{background:var(--gold-d);border-radius:2px;}
+
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-family:'Jost',sans-serif;font-size:11px;font-weight:600;letter-spacing:3px;text-transform:uppercase;cursor:pointer;text-decoration:none;border:none;transition:all var(--tr);white-space:nowrap;}
+.btn-primary{background:var(--gold);color:#000;padding:14px 32px;clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);}
+.btn-primary:hover{background:var(--gold-l);transform:translateY(-2px);box-shadow:0 4px 24px rgba(201,147,10,.25);}
+.btn-outline{background:transparent;color:var(--gold);border:1px solid var(--gold);padding:13px 28px;}
+.btn-outline:hover{background:var(--gold);color:#000;transform:translateY(-2px);}
+.btn-ghost{background:transparent;color:var(--muted);padding:8px 0;font-size:11px;letter-spacing:2px;}
+.btn-ghost:hover{color:var(--gold);}
+.btn-wa{background:#25D366;color:#fff;padding:13px 24px;clip-path:polygon(10px 0%,100% 0%,calc(100% - 10px) 100%,0% 100%);}
+.btn-wa:hover{background:#1ebe5d;transform:translateY(-2px);}
+.btn-sm{padding:9px 18px!important;font-size:10px!important;letter-spacing:2px!important;}
+button:disabled{opacity:.3;cursor:not-allowed;transform:none!important;}
+
+/* LAYOUT */
+.container{max-width:1200px;margin:0 auto;padding:0 32px;}
+.section{padding:80px 0;}
+.eyebrow{font-size:10px;letter-spacing:4px;text-transform:uppercase;color:var(--gold);}
+.divider-gold{height:1px;background:linear-gradient(90deg,transparent,var(--gold),transparent);margin:0;}
+
+/* NAVBAR */
+nav{position:fixed;top:0;left:0;right:0;z-index:200;background:rgba(8,8,8,.88);backdrop-filter:blur(12px);border-bottom:1px solid transparent;transition:border-color .3s;}
+nav.scrolled{border-bottom-color:var(--border);}
+.nav-inner{max-width:1200px;margin:0 auto;padding:0 32px;height:68px;display:flex;align-items:center;justify-content:space-between;}
+.nav-logo{display:flex;align-items:center;gap:12px;text-decoration:none;cursor:pointer;}
+.nav-logo-name{font-family:'Jost',sans-serif;font-weight:600;font-size:15px;letter-spacing:4px;color:var(--gold-l);}
+.nav-logo-sub{font-size:9px;letter-spacing:3px;color:var(--dim);}
+.nav-links{display:flex;align-items:center;gap:32px;}
+.nav-link{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);cursor:pointer;position:relative;transition:color .2s;}
+.nav-link::after{content:'';position:absolute;bottom:-4px;left:0;right:0;height:1px;background:var(--gold);transform:scaleX(0);transition:transform .2s;}
+.nav-link:hover,.nav-link.active{color:var(--gold);}
+.nav-link:hover::after,.nav-link.active::after{transform:scaleX(1);}
+.nav-link-admin{font-size:9px;letter-spacing:2px;color:var(--dim)!important;}
+.nav-link-admin::after{display:none!important;}
+.nav-burger{display:none;flex-direction:column;gap:5px;background:none;border:none;cursor:pointer;padding:4px;}
+.nav-burger span{display:block;width:22px;height:1px;background:var(--muted);transition:all .3s;}
+.nav-burger.open span:nth-child(1){transform:translateY(6px) rotate(45deg);}
+.nav-burger.open span:nth-child(2){opacity:0;}
+.nav-burger.open span:nth-child(3){transform:translateY(-6px) rotate(-45deg);}
+
+/* SCREENS */
+.screen{display:none;min-height:calc(100vh - 68px);}
+.screen.active{display:block;}
+main{padding-top:68px;}
+
+/* ── HOME ── */
+.hero{position:relative;min-height:calc(100vh - 68px);display:flex;align-items:center;overflow:hidden;}
+.hero-glow-1{position:absolute;width:600px;height:400px;background:radial-gradient(circle,rgba(201,147,10,.12),transparent 70%);top:-100px;left:-100px;pointer-events:none;filter:blur(80px);}
+.hero-glow-2{position:absolute;width:400px;height:400px;background:radial-gradient(circle,rgba(201,147,10,.07),transparent 70%);bottom:0;right:10%;pointer-events:none;filter:blur(80px);}
+.hero-content{position:relative;z-index:2;padding:60px 32px 80px;}
+.hero-title{font-size:clamp(48px,8vw,96px);color:#fff;margin:16px 0 24px;}
+.hero-title em{font-style:italic;color:var(--gold-l);}
+.hero-desc{font-size:15px;color:var(--muted);max-width:480px;line-height:1.8;margin-bottom:40px;}
+.hero-cta{display:flex;gap:16px;flex-wrap:wrap;}
+.hero-scroll{position:absolute;bottom:32px;left:50%;transform:translateX(-50%);z-index:2;}
+.hero-scroll span{display:block;width:1px;height:60px;background:linear-gradient(to bottom,var(--gold),transparent);margin:0 auto;animation:scrollPulse 2s ease-in-out infinite;}
+@keyframes scrollPulse{0%,100%{opacity:.3;}50%{opacity:.8;}}
+
+.features-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:2px;}
+.feature-card{background:var(--panel);border:1px solid var(--border);padding:36px 28px;transition:border-color .25s,background .25s;}
+.feature-card:hover{border-color:var(--gold-d);background:var(--panel2);}
+.feature-icon{color:var(--gold);margin-bottom:18px;}
+.feature-card h3{font-size:22px;color:#fff;margin-bottom:8px;}
+.feature-card p{font-size:13px;color:var(--muted);line-height:1.7;}
+
+.collections-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px;}
+.collection-block{position:relative;min-height:460px;display:flex;align-items:flex-end;overflow:hidden;cursor:pointer;border:1px solid var(--border);transition:border-color .3s;}
+.collection-block:hover{border-color:var(--gold-d);}
+.col-bg-glasses{background:linear-gradient(135deg,#0f0e0a,#1a1500 60%,#0a0900);}
+.col-bg-frames{background:linear-gradient(135deg,#0a0a0f,#000818 60%,#050510);}
+.collection-content{position:relative;z-index:2;padding:36px;}
+.collection-content h2{font-size:48px;color:#fff;margin:8px 0 12px;}
+.collection-content p{font-size:13px;color:var(--muted);line-height:1.7;margin-bottom:16px;}
+.col-arrow{font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--gold);}
+.collection-block:hover .col-arrow{letter-spacing:3px;}
+.col-graphic{position:absolute;right:32px;top:50%;transform:translateY(-50%);opacity:.2;transition:opacity .3s;pointer-events:none;}
+.collection-block:hover .col-graphic{opacity:.38;}
+
+/* ── PRODUCTS ── */
+.page-header{text-align:center;margin-bottom:52px;}
+.page-title{font-size:clamp(38px,6vw,68px);color:#fff;margin:12px 0 16px;}
+.page-desc{font-size:14px;color:var(--muted);max-width:480px;margin:0 auto;line-height:1.8;}
+.filter-bar{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-bottom:44px;}
+.filter-btn{background:transparent;border:1px solid var(--border2);color:var(--muted);padding:7px 18px;font-family:'Jost',sans-serif;font-size:10px;font-weight:500;letter-spacing:2px;text-transform:uppercase;cursor:pointer;transition:all .2s;}
+.filter-btn:hover,.filter-btn.active{border-color:var(--gold);color:var(--gold);background:rgba(201,147,10,.06);}
+.product-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:2px;}
+.frames-grid{grid-template-columns:repeat(auto-fill,minmax(240px,1fr));}
+.product-card{background:var(--panel);border:1px solid var(--border);overflow:hidden;transition:border-color .25s,transform .25s,box-shadow .25s;}
+.product-card:hover{border-color:var(--gold-d);transform:translateY(-4px);box-shadow:0 12px 40px rgba(0,0,0,.5);}
+.product-img-wrap{position:relative;background:#111;aspect-ratio:16/9;overflow:hidden;display:flex;align-items:center;justify-content:center;}
+.product-img-frame{aspect-ratio:3/4;}
+.product-img{width:82%;height:82%;object-fit:contain;transition:transform .4s;}
+.product-card:hover .product-img{transform:scale(1.05);}
+.product-img-inner{width:65%;height:85%;}
+.product-overlay{position:absolute;inset:0;background:rgba(0,0,0,.65);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .25s;}
+.product-card:hover .product-overlay{opacity:1;}
+.oos-badge{position:absolute;top:10px;right:10px;background:#333;color:var(--muted);font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:3px 9px;}
+.product-info{padding:18px;}
+.product-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:14px;gap:10px;}
+.product-ref{font-size:9px;letter-spacing:2px;color:var(--dim);margin-bottom:3px;}
+.product-name{font-family:'Cormorant Garamond',serif;font-size:19px;color:#fff;font-weight:400;}
+.product-cat{font-size:10px;letter-spacing:1px;color:var(--muted);margin-top:2px;}
+.product-price{font-family:'Cormorant Garamond',serif;font-size:21px;color:var(--gold-l);white-space:nowrap;}
+.product-actions{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* ── TRYON ── */
+.tryon-layout{display:grid;grid-template-columns:260px 1fr;gap:24px;margin-top:28px;}
+.tryon-sidebar{display:flex;flex-direction:column;gap:0;}
+.tryon-selector{display:flex;flex-direction:column;gap:2px;max-height:400px;overflow-y:auto;padding-right:4px;}
+.selector-item{background:var(--panel);border:1px solid var(--border);padding:9px 13px;display:flex;align-items:center;gap:11px;cursor:pointer;transition:border-color .2s,background .2s;text-align:left;}
+.selector-item img{width:58px;height:28px;object-fit:contain;background:#0a0a0a;}
+.selector-item span{font-size:11px;letter-spacing:1px;color:var(--muted);}
+.selector-item:hover,.selector-item.active{border-color:var(--gold);background:#1a1400;}
+.selector-item.active span{color:var(--gold);}
+.selected-info{margin-top:18px;padding-top:18px;border-top:1px solid var(--border);}
+.tryon-main{display:flex;flex-direction:column;gap:18px;}
+.tryon-start{background:var(--panel);border:1px solid var(--border);padding:70px 36px;text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px;}
+.tryon-start-icon{color:var(--gold-d);margin-bottom:8px;}
+.tryon-start h2{font-size:30px;color:#fff;}
+.tryon-start p{font-size:13px;color:var(--muted);max-width:340px;line-height:1.7;}
+.tryon-video-wrap{position:relative;background:#000;border:1px solid var(--border);overflow:hidden;aspect-ratio:4/3;max-height:500px;}
+.tryon-video{width:100%;height:100%;object-fit:cover;transform:scaleX(-1);display:block;}
+.tryon-overlay{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;transform:scaleX(-1);}
+.tryon-loading{position:absolute;inset:0;background:rgba(0,0,0,.82);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;color:var(--muted);font-size:11px;letter-spacing:2px;}
+.tryon-controls{display:flex;gap:14px;align-items:center;flex-wrap:wrap;}
+.tryon-error{background:var(--panel);border:1px solid #333;padding:40px;text-align:center;color:var(--muted);}
+.result-preview{width:100%;max-height:490px;object-fit:contain;border:1px solid var(--border);background:#000;}
+.result-actions{display:flex;gap:12px;flex-wrap:wrap;align-items:center;}
+.hidden{display:none!important;}
+
+/* ── SIMULATOR ── */
+.sim-layout{display:grid;grid-template-columns:240px 1fr;gap:24px;margin-top:28px;}
+.frame-selector{display:flex;flex-direction:column;gap:2px;max-height:360px;overflow-y:auto;}
+.frame-thumb{background:var(--panel);border:1px solid var(--border);padding:7px 11px;display:flex;align-items:center;gap:9px;cursor:pointer;transition:border-color .2s,background .2s;text-align:left;}
+.frame-thumb img{width:34px;height:46px;object-fit:contain;background:#0a0a0a;}
+.frame-thumb span{font-size:10px;letter-spacing:1px;color:var(--muted);}
+.frame-thumb:hover,.frame-thumb.active{border-color:var(--gold);background:#1a1400;}
+.frame-thumb.active span{color:var(--gold);}
+.sim-product-info{margin-top:18px;padding-top:18px;border-top:1px solid var(--border);}
+.sim-mode-select{background:var(--panel);border:1px solid var(--border);padding:56px 36px;text-align:center;}
+.mode-cards{display:flex;gap:14px;justify-content:center;flex-wrap:wrap;margin-top:28px;}
+.mode-card{background:var(--panel2);border:1px solid var(--border2);padding:32px 28px;width:190px;cursor:pointer;transition:border-color .2s,transform .2s;text-align:center;}
+.mode-card:hover{border-color:var(--gold);transform:translateY(-4px);}
+.mode-icon{color:var(--gold);margin-bottom:14px;}
+.mode-card h3{font-size:21px;color:#fff;margin-bottom:5px;}
+.mode-card p{font-size:11px;color:var(--muted);line-height:1.5;}
+.env-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:8px;margin-top:10px;}
+.env-thumb{background:var(--panel);border:1px solid var(--border);overflow:hidden;cursor:pointer;transition:border-color .2s,transform .2s;text-align:left;}
+.env-thumb:hover{border-color:var(--gold);transform:translateY(-2px);}
+.env-thumb img{width:100%;aspect-ratio:16/10;object-fit:cover;display:block;}
+.env-thumb span{display:block;font-size:10px;letter-spacing:1.5px;color:var(--muted);padding:7px 9px;}
+.render-controls-top{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px;}
+.render-wrap{background:#000;border:1px solid var(--border);min-height:380px;display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.render-img{width:100%;display:block;}
+.render-loading{display:flex;flex-direction:column;align-items:center;gap:14px;color:var(--muted);font-size:11px;letter-spacing:2px;padding:60px;}
+.render-actions{display:flex;gap:12px;flex-wrap:wrap;margin-top:18px;}
+
+/* ── ADMIN ── */
+.admin-login-wrap{min-height:calc(100vh - 68px);display:flex;align-items:center;justify-content:center;padding:40px 20px;background:radial-gradient(ellipse 60% 50% at 50% 0%,rgba(201,147,10,.06),transparent 70%);}
+.login-box{background:var(--panel);border:1px solid var(--border);padding:44px;width:100%;max-width:400px;}
+.admin-header{display:flex;align-items:flex-start;justify-content:space-between;margin-bottom:36px;}
+.admin-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;margin-bottom:36px;}
+.stat-card{background:var(--panel);border:1px solid var(--border);padding:26px 22px;text-align:center;}
+.stat-num{font-family:'Cormorant Garamond',serif;font-size:46px;color:var(--gold-l);line-height:1;}
+.stat-label{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);margin-top:5px;}
+.admin-tabs{display:flex;gap:2px;margin-bottom:22px;border-bottom:1px solid var(--border);}
+.admin-tab{background:transparent;border:none;border-bottom:2px solid transparent;padding:11px 22px;font-family:'Jost',sans-serif;font-size:11px;font-weight:500;letter-spacing:2px;text-transform:uppercase;color:var(--muted);cursor:pointer;margin-bottom:-1px;transition:color .2s,border-color .2s;}
+.admin-tab:hover{color:var(--text);}
+.admin-tab.active{color:var(--gold);border-bottom-color:var(--gold);}
+.admin-add-row{display:flex;justify-content:flex-end;margin-bottom:18px;}
+.admin-table-wrap{overflow-x:auto;}
+.admin-table{width:100%;border-collapse:collapse;font-size:13px;}
+.admin-table th{font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--dim);padding:9px 14px;border-bottom:1px solid var(--border);text-align:left;white-space:nowrap;}
+.admin-table td{padding:13px 14px;border-bottom:1px solid var(--border);vertical-align:middle;}
+.admin-table tr:hover td{background:rgba(255,255,255,.02);}
+.table-thumb{width:48px;height:34px;object-fit:contain;background:#0a0a0a;}
+.id-cell{font-size:9px;letter-spacing:1.5px;color:var(--dim);white-space:nowrap;}
+.stock-btn{font-size:9px;letter-spacing:2px;text-transform:uppercase;padding:4px 9px;border:none;cursor:pointer;transition:filter .2s;}
+.stock-in{background:rgba(45,107,31,.22);color:#5a9e45;}
+.stock-out{background:rgba(80,30,10,.22);color:#a06040;}
+.stock-btn:hover{filter:brightness(1.25);}
+.del-btn{background:transparent;border:none;color:#c03020;font-size:11px;letter-spacing:1px;cursor:pointer;font-family:'Jost',sans-serif;}
+.del-btn:hover{color:#e04030;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.87);z-index:500;display:flex;align-items:center;justify-content:center;padding:20px;backdrop-filter:blur(4px);}
+.modal{background:var(--panel);border:1px solid var(--border2);max-width:520px;width:100%;max-height:90vh;overflow-y:auto;padding:38px;position:relative;}
+.modal-close{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--muted);font-size:20px;cursor:pointer;line-height:1;transition:color .2s;}
+.modal-close:hover{color:var(--gold);}
+.form-group{margin-bottom:18px;}
+.form-group label{font-size:10px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);display:block;margin-bottom:6px;}
+.form-group input,.form-group select{background:var(--panel);border:1px solid var(--border2);color:var(--text);padding:11px 15px;font-family:'Jost',sans-serif;font-size:13px;font-weight:300;width:100%;outline:none;border-radius:var(--r);transition:border-color var(--tr);}
+.form-group input:focus{border-color:var(--gold);}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.img-preview{margin-top:10px;width:90px;height:72px;background:#0a0a0a;border:1px solid var(--border);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.img-preview img{max-width:100%;max-height:100%;object-fit:contain;}
+
+/* FOOTER */
+footer{background:var(--dark);border-top:1px solid var(--border);margin-top:80px;}
+.footer-inner{max-width:1200px;margin:0 auto;padding:44px 32px 28px;display:flex;align-items:flex-start;justify-content:space-between;flex-wrap:wrap;gap:28px;}
+.footer-brand{display:flex;align-items:center;gap:13px;}
+.footer-name{font-size:13px;letter-spacing:3px;color:var(--gold-l);text-transform:uppercase;}
+.footer-sub{font-size:10px;letter-spacing:2px;color:var(--dim);margin-top:2px;}
+.footer-links{display:flex;gap:24px;}
+.footer-link{font-size:10px;letter-spacing:3px;text-transform:uppercase;color:var(--muted);cursor:pointer;transition:color .2s;}
+.footer-link:hover{color:var(--gold);}
+.footer-social{display:flex;gap:10px;}
+.social-btn{width:36px;height:36px;border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;color:var(--muted);text-decoration:none;transition:all .2s;cursor:pointer;}
+.social-btn:hover{border-color:var(--gold);color:var(--gold);}
+.footer-bottom{border-top:1px solid var(--border);padding:16px 32px;max-width:1200px;margin:0 auto;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:8px;font-size:10px;letter-spacing:1px;color:var(--dim);}
+.footer-credit span{color:var(--gold-d);letter-spacing:2px;}
+
+/* MISC */
+.spinner{width:30px;height:30px;border:2px solid var(--border2);border-top-color:var(--gold);border-radius:50%;animation:spin .8s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.toast{position:fixed;bottom:28px;right:28px;background:var(--panel2);border:1px solid var(--gold);color:var(--text);padding:13px 22px;font-size:13px;z-index:9999;animation:toastIn .3s ease;}
+@keyframes toastIn{from{opacity:0;transform:translateY(10px);}to{opacity:1;transform:translateY(0);}}
+.fade-in{animation:fadeUp .5s ease forwards;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+/* RESPONSIVE */
+@media(max-width:900px){
+  .tryon-layout,.sim-layout{grid-template-columns:1fr;}
+  .collections-grid{grid-template-columns:1fr;}
+}
+@media(max-width:768px){
+  .container{padding:0 18px;}
+  .section{padding:56px 0;}
+  .nav-inner{padding:0 18px;}
+  .nav-burger{display:flex;}
+  .nav-links{display:none;position:absolute;top:68px;left:0;right:0;background:var(--dark);border-bottom:1px solid var(--border);flex-direction:column;padding:22px;gap:18px;align-items:flex-start;}
+  .nav-links.open{display:flex;}
+  .admin-stats{grid-template-columns:1fr 1fr;}
+  .form-row{grid-template-columns:1fr;}
+}
+@media(max-width:480px){
+  .admin-stats{grid-template-columns:1fr;}
+  .hero-title{font-size:42px;}
+}
+</style>
+</head>
+<body>
+
+<!-- NAVBAR -->
+<nav id="navbar">
+  <div class="nav-inner">
+    <div class="nav-logo" onclick="showScreen('home')">
+      <svg width="36" height="36" viewBox="0 0 44 44" fill="none">
+        <path d="M6 38 L6 6 L20 28 L20 6 L38 6 L38 38 L24 16 L24 38 Z" fill="url(#ng)"/>
+        <defs><linearGradient id="ng" x1="6" y1="6" x2="38" y2="38"><stop offset="0%" stop-color="#E8B020"/><stop offset="100%" stop-color="#555"/></linearGradient></defs>
+      </svg>
+      <div><div class="nav-logo-name">NHAMAT</div><div class="nav-logo-sub">Lda</div></div>
+    </div>
+    <div class="nav-links" id="navLinks">
+      <span class="nav-link active" id="nl-home" onclick="showScreen('home')">Início</span>
+      <span class="nav-link" id="nl-oculos" onclick="showScreen('oculos')">Óculos</span>
+      <span class="nav-link" id="nl-quadros" onclick="showScreen('quadros')">Quadros</span>
+      <span class="nav-link nav-link-admin" id="nl-admin" onclick="showScreen('admin')">Admin</span>
+    </div>
+    <button class="nav-burger" id="burger" onclick="toggleMenu()"><span></span><span></span><span></span></button>
+  </div>
+</nav>
+
+<main>
+
+<!-- ═══════════════ HOME ═══════════════ -->
+<div id="screen-home" class="screen active">
+  <section class="hero">
+    <div class="hero-glow-1"></div><div class="hero-glow-2"></div>
+    <div class="hero-content container">
+      <p class="eyebrow fade-in">Serviço &amp; Comércio</p>
+      <h1 class="hero-title fade-in">A elegância<br/><em>ao seu alcance</em></h1>
+      <p class="hero-desc fade-in">Óculos com try-on ao vivo. Quadros decorativos com simulação de ambiente.<br/>Experimente antes de comprar.</p>
+      <div class="hero-cta fade-in">
+        <button class="btn btn-primary" onclick="showScreen('oculos')">Ver Óculos</button>
+        <button class="btn btn-outline" onclick="showScreen('quadros')">Ver Quadros</button>
+      </div>
+    </div>
+    <div class="hero-scroll"><span></span></div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <div class="features-grid">
+        <div class="feature-card">
+          <div class="feature-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></div>
+          <h3>Try-On ao Vivo</h3>
+          <p>Experimente óculos em tempo real com a câmera. Sem instalar nada.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M3 9h18M9 21V9"/></svg></div>
+          <h3>Simulador de Ambiente</h3>
+          <p>Veja como um quadro fica na sua sala, cozinha ou casa de banho.</p>
+        </div>
+        <div class="feature-card">
+          <div class="feature-icon"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013 13.09a19.79 19.79 0 01-3.07-8.67A2 2 0 011.95 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg></div>
+          <h3>Compra via WhatsApp</h3>
+          <p>Fale diretamente com o vendedor. Sem formulários, sem conta.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider-gold"></div>
+
+  <section class="section">
+    <div class="container">
+      <div class="collections-grid">
+        <div class="collection-block col-bg-glasses" onclick="showScreen('oculos')">
+          <div class="collection-content">
+            <p class="eyebrow">Coleção</p>
+            <h2>Óculos</h2>
+            <p>Aviador, cat-eye, vintage e mais.<br/>Try-on ao vivo incluído.</p>
+            <span class="col-arrow">Explorar →</span>
+          </div>
+          <div class="col-graphic"><svg viewBox="0 0 300 120" width="190" fill="none"><g stroke="#C9930A" stroke-width="3" stroke-linecap="round"><path d="M20,55 Q80,15 150,55 Q80,100 20,55 Z"/><path d="M160,55 Q220,15 280,55 Q220,100 160,55 Z"/><path d="M150,55 Q155,48 160,55"/><line x1="5" y1="42" x2="20" y2="50"/><line x1="280" y1="50" x2="295" y2="42"/></g></svg></div>
+        </div>
+        <div class="collection-block col-bg-frames" onclick="showScreen('quadros')">
+          <div class="collection-content">
+            <p class="eyebrow">Coleção</p>
+            <h2>Quadros</h2>
+            <p>Arte original para o seu espaço.<br/>Simulação de ambiente incluída.</p>
+            <span class="col-arrow">Explorar →</span>
+          </div>
+          <div class="col-graphic"><svg viewBox="0 0 200 260" width="110" fill="none"><rect x="10" y="10" width="180" height="240" rx="2" stroke="#C9930A" stroke-width="3"/><rect x="22" y="22" width="156" height="216" rx="1" stroke="#8a6308" stroke-width="1.5"/><path d="M22,248 Q80,160 100,100 Q130,50 178,22" stroke="#C9930A" stroke-width="1" opacity=".5"/><circle cx="100" cy="120" r="28" stroke="#E8B020" stroke-width="1.5" opacity=".6"/></svg></div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ═══════════════ ÓCULOS ═══════════════ -->
+<div id="screen-oculos" class="screen">
+  <div class="section">
+    <div class="container">
+      <div class="page-header">
+        <p class="eyebrow">Coleção</p>
+        <h1 class="page-title">Óculos</h1>
+        <p class="page-desc">Cada montura foi pensada para um rosto e um estilo. Use o try-on ao vivo para encontrar a sua.</p>
+      </div>
+      <div class="filter-bar" id="glasses-filters"></div>
+      <div class="product-grid" id="glasses-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ QUADROS ═══════════════ -->
+<div id="screen-quadros" class="screen">
+  <div class="section">
+    <div class="container">
+      <div class="page-header">
+        <p class="eyebrow">Coleção</p>
+        <h1 class="page-title">Quadros Decorativos</h1>
+        <p class="page-desc">Arte para o seu espaço. Use o simulador e veja como cada quadro transforma a divisão.</p>
+      </div>
+      <div class="filter-bar" id="frames-filters"></div>
+      <div class="product-grid frames-grid" id="frames-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ TRY-ON ═══════════════ -->
+<div id="screen-tryon" class="screen">
+  <div class="section">
+    <div class="container">
+      <button class="btn btn-ghost" onclick="showScreen('oculos')">← Voltar aos óculos</button>
+      <div class="tryon-layout">
+        <div class="tryon-sidebar">
+          <p class="eyebrow" style="margin-bottom:14px">Montura</p>
+          <div class="tryon-selector" id="tryon-selector"></div>
+          <div class="selected-info" id="tryon-info"></div>
+        </div>
+        <div class="tryon-main" id="tryon-main">
+          <div class="tryon-start" id="tryon-start">
+            <div class="tryon-start-icon"><svg width="46" height="46" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg></div>
+            <h2>Experimente ao vivo</h2>
+            <p>Ligue a câmera para ver como os óculos ficam em si. Nada é enviado para servidores.</p>
+            <button class="btn btn-primary" onclick="startCamera()">Ligar Câmera</button>
+          </div>
+          <div class="tryon-video-wrap hidden" id="tryon-video-wrap">
+            <video id="tryon-video" class="tryon-video" autoplay playsinline muted></video>
+            <canvas id="tryon-canvas" class="tryon-overlay"></canvas>
+            <div class="tryon-loading" id="tryon-loading"><div class="spinner"></div><span style="font-size:11px;letter-spacing:2px">A iniciar…</span></div>
+          </div>
+          <div class="tryon-controls hidden" id="tryon-controls">
+            <button class="btn btn-primary" onclick="takePhoto()">📷 Tirar Foto</button>
+            <button class="btn btn-ghost" onclick="stopCamera()">Fechar câmera</button>
+          </div>
+          <div class="hidden" id="tryon-result">
+            <img id="result-img" class="result-preview" alt="Resultado"/>
+            <div class="result-actions" style="margin-top:16px">
+              <button class="btn btn-primary" onclick="downloadPhoto()">⬇ Guardar Foto</button>
+              <button class="btn btn-outline" onclick="startCamera()">Tirar outra</button>
+              <button class="btn btn-ghost" onclick="resetTryon()">Recomeçar</button>
+            </div>
+          </div>
+          <div class="tryon-error hidden" id="tryon-error">
+            <p style="color:var(--muted)">Não foi possível aceder à câmera.</p>
+            <p style="font-size:12px;color:var(--dim);margin-top:6px">Verifique as permissões do browser e tente novamente.</p>
+            <button class="btn btn-outline" onclick="startCamera()" style="margin-top:18px">Tentar novamente</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ SIMULATOR ═══════════════ -->
+<div id="screen-simulator" class="screen">
+  <div class="section">
+    <div class="container">
+      <button class="btn btn-ghost" onclick="showScreen('quadros')">← Voltar aos quadros</button>
+      <div class="sim-layout">
+        <div class="sim-sidebar">
+          <p class="eyebrow" style="margin-bottom:12px">Quadro</p>
+          <div class="frame-selector" id="sim-selector"></div>
+          <div class="sim-product-info" id="sim-info"></div>
+        </div>
+        <div class="sim-main" id="sim-main">
+          <div class="sim-mode-select" id="sim-mode-select">
+            <p class="eyebrow" style="margin-bottom:8px">Simulador</p>
+            <h2 style="font-size:34px;color:#fff;margin-bottom:28px">Escolha o ambiente</h2>
+            <div class="mode-cards">
+              <div class="mode-card" onclick="simSetMode('wall')">
+                <div class="mode-icon"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="3" width="18" height="18" rx="1"/><path d="M3 9h18M9 21V9"/></svg></div>
+                <h3>Parede</h3><p>Branca, creme, madeira, cinza ou tijolo</p>
+              </div>
+              <div class="mode-card" onclick="simSetMode('room')">
+                <div class="mode-icon"><svg width="34" height="34" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg></div>
+                <h3>Compartimento</h3><p>Sala, cozinha ou casa de banho</p>
+              </div>
+            </div>
+          </div>
+          <div class="hidden" id="sim-env-select">
+            <button class="btn btn-ghost" onclick="simBackToMode()" style="margin-bottom:20px">← Tipo de ambiente</button>
+            <p class="eyebrow" style="margin-bottom:14px" id="sim-env-title">Escolha</p>
+            <div class="env-grid" id="sim-env-grid"></div>
+          </div>
+          <div class="hidden" id="sim-render">
+            <div class="render-controls-top">
+              <button class="btn btn-ghost" onclick="simBackToEnv()">← Mudar ambiente</button>
+              <span class="eyebrow" id="sim-env-name"></span>
+            </div>
+            <div class="render-wrap" id="sim-render-wrap">
+              <div class="render-loading"><div class="spinner"></div><p>A gerar simulação…</p></div>
+            </div>
+            <canvas id="sim-canvas" style="display:none"></canvas>
+            <div class="render-actions">
+              <button class="btn btn-primary" onclick="simDownload()">⬇ Guardar Imagem</button>
+              <button class="btn btn-outline" onclick="simBackToEnv()">Outro ambiente</button>
+              <button class="btn btn-outline" onclick="simReset()">Recomeçar</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════ ADMIN ═══════════════ -->
+<div id="screen-admin" class="screen">
+  <div id="admin-login-panel">
+    <div class="admin-login-wrap">
+      <div class="login-box">
+        <svg width="38" height="38" viewBox="0 0 44 44" fill="none" style="display:block;margin:0 auto 22px"><path d="M6 38 L6 6 L20 28 L20 6 L38 6 L38 38 L24 16 L24 38 Z" fill="url(#lg)"/><defs><linearGradient id="lg" x1="6" y1="6" x2="38" y2="38"><stop offset="0%" stop-color="#E8B020"/><stop offset="100%" stop-color="#555"/></linearGradient></defs></svg>
+        <p class="eyebrow" style="text-align:center;margin-bottom:7px">Acesso Restrito</p>
+        <h2 style="font-size:30px;text-align:center;margin-bottom:28px">Área Admin</h2>
+        <div class="form-group">
+          <label>Palavra-passe</label>
+          <input type="password" id="admin-pw" placeholder="••••••••" onkeydown="if(event.key==='Enter')adminLogin()"/>
+        </div>
+        <p id="login-error" style="color:#e05;font-size:12px;margin-bottom:12px;text-align:center;display:none">Palavra-passe incorreta</p>
+        <button class="btn btn-primary" style="width:100%" onclick="adminLogin()">Entrar</button>
+        <p style="margin-top:18px;font-size:10px;color:var(--dim);text-align:center">Palavra-passe padrão: nhamat2025</p>
+      </div>
+    </div>
+  </div>
+  <div id="admin-dashboard" style="display:none" class="section">
+    <div class="container">
+      <div class="admin-header">
+        <div><p class="eyebrow">Painel</p><h1 style="font-size:38px;color:#fff;margin-top:5px">Admin</h1></div>
+        <button class="btn btn-ghost" onclick="adminLogout()">Sair →</button>
+      </div>
+      <div class="admin-stats" id="admin-stats"></div>
+      <div class="admin-tabs">
+        <button class="admin-tab active" id="tab-glasses" onclick="adminSetTab('glasses')">Óculos</button>
+        <button class="admin-tab" id="tab-frames" onclick="adminSetTab('frames')">Quadros</button>
+      </div>
+      <div class="admin-add-row">
+        <button class="btn btn-primary" onclick="openAddModal()" id="admin-add-btn">+ Adicionar</button>
+      </div>
+      <div class="admin-table-wrap"><table class="admin-table" id="admin-table"><thead id="admin-thead"></thead><tbody id="admin-tbody"></tbody></table></div>
+    </div>
+  </div>
+  <div class="modal-overlay hidden" id="product-modal">
+    <div class="modal">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+      <p class="eyebrow" style="margin-bottom:7px">Novo produto</p>
+      <h2 style="font-size:26px;margin-bottom:24px" id="modal-title">Adicionar</h2>
+      <div class="form-group"><label>Nome *</label><input id="f-name" placeholder="Ex: Aviador Clássico"/></div>
+      <div class="form-group"><label>Categoria *</label><input id="f-cat" placeholder="Ex: Vintage"/></div>
+      <div class="form-row">
+        <div class="form-group"><label>Preço *</label><input id="f-price" placeholder="Ex: 89€"/></div>
+        <div class="form-group" id="f-dim-group"><label>Dimensões</label><input id="f-dim" placeholder="Ex: 60×80cm"/></div>
+      </div>
+      <div class="form-group">
+        <label>Imagem (PNG/JPG/SVG)</label>
+        <input type="file" id="f-img" accept="image/*" onchange="previewImg(this)" style="background:transparent;border:1px dashed var(--border2);padding:9px"/>
+        <div class="img-preview hidden" id="f-preview"><img id="f-preview-img" alt=""/></div>
+      </div>
+      <div style="display:flex;gap:12px;margin-top:24px">
+        <button class="btn btn-primary" onclick="saveProduct()">Guardar produto</button>
+        <button class="btn btn-ghost" onclick="closeModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+</main>
+
+<!-- FOOTER -->
+<footer>
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <svg width="30" height="30" viewBox="0 0 44 44" fill="none"><path d="M6 38 L6 6 L20 28 L20 6 L38 6 L38 38 L24 16 L24 38 Z" fill="url(#fg)"/><defs><linearGradient id="fg" x1="6" y1="6" x2="38" y2="38"><stop offset="0%" stop-color="#E8B020"/><stop offset="100%" stop-color="#444"/></linearGradient></defs></svg>
+      <div><div class="footer-name">NHAMAT, LDA</div><div class="footer-sub">Serviço e Comércio</div></div>
+    </div>
+    <div class="footer-links">
+      <span class="footer-link" onclick="showScreen('oculos')">Óculos</span>
+      <span class="footer-link" onclick="showScreen('quadros')">Quadros</span>
+    </div>
+    <div class="footer-social">
+      <a href="https://facebook.com" target="_blank" rel="noreferrer" class="social-btn" aria-label="Facebook">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18 2h-3a5 5 0 00-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 011-1h3z"/></svg>
+      </a>
+      <a href="https://instagram.com" target="_blank" rel="noreferrer" class="social-btn" aria-label="Instagram">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© <span id="yr"></span> NHAMAT, LDA · Todos os direitos reservados</p>
+    <p class="footer-credit">Criado por <span>FIADUMONT</span></p>
+  </div>
+</footer>
+
+<div id="toast" class="toast hidden"></div>
+
+<script>
+// ═══════════════════════════════════════════════
+// CONFIG — EDITE AQUI
+// ═══════════════════════════════════════════════
+const WHATSAPP = '351900000000'; // ← Coloque o seu número (com código do país, sem + ou espaços)
+const ADMIN_PASS = 'nhamat2025'; // ← Palavra-passe do admin
+
+// ═══════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════
+const GLASS_SHAPES = {
+  'Aviador Dourado':'aviator','Quadrado Urbano':'square','Cat-Eye Élégance':'cateye',
+  'Round Vintage':'round','Sport Titanium':'wrap','Minimal Prata':'minimal'
+};
+const GLASS_COLORS = {
+  'Aviador Dourado':'#C9930A','Quadrado Urbano':'#111111','Cat-Eye Élégance':'#C9930A',
+  'Round Vintage':'#5C3A1E','Sport Titanium':'#888888','Minimal Prata':'#aaaaaa'
+};
+
+const DEFAULT_GLASSES = [
+  {id:'oculos-001',name:'Aviador Dourado',price:'89€',category:'Clássico',image:'images/glasses/oculos-001.svg',stock:true},
+  {id:'oculos-002',name:'Quadrado Urbano',price:'75€',category:'Moderno',image:'images/glasses/oculos-002.svg',stock:true},
+  {id:'oculos-003',name:'Cat-Eye Élégance',price:'110€',category:'Feminino',image:'images/glasses/oculos-003.svg',stock:true},
+  {id:'oculos-004',name:'Round Vintage',price:'95€',category:'Vintage',image:'images/glasses/oculos-004.svg',stock:true},
+  {id:'oculos-005',name:'Sport Titanium',price:'130€',category:'Desportivo',image:'images/glasses/oculos-005.svg',stock:true},
+  {id:'oculos-006',name:'Minimal Prata',price:'85€',category:'Minimalista',image:'images/glasses/oculos-006.svg',stock:true},
+];
+const DEFAULT_FRAMES = [
+  {id:'quadro-001',name:'Abstrato Dourado',price:'180€',category:'Abstrato',dimensions:'60×80cm',image:'images/frames/quadro-001.svg',stock:true},
+  {id:'quadro-002',name:'Botânico Premium',price:'220€',category:'Natureza',dimensions:'50×70cm',image:'images/frames/quadro-002.svg',stock:true},
+  {id:'quadro-003',name:'Geométrico Azul',price:'160€',category:'Geométrico',dimensions:'60×60cm',image:'images/frames/quadro-003.svg',stock:true},
+  {id:'quadro-004',name:'Minimalista Negro',price:'195€',category:'Minimalista',dimensions:'40×60cm',image:'images/frames/quadro-004.svg',stock:true},
+  {id:'quadro-005',name:'Pôr do Sol',price:'240€',category:'Paisagem',dimensions:'80×60cm',image:'images/frames/quadro-005.svg',stock:true},
+  {id:'quadro-006',name:'Mapa de Lisboa',price:'210€',category:'Cidade',dimensions:'70×90cm',image:'images/frames/quadro-006.svg',stock:true},
+];
+const WALL_ENVS = [
+  {id:'parede-branca',name:'Parede Branca Lisa',image:'images/environments/parede-branca.svg'},
+  {id:'parede-creme',name:'Parede Creme',image:'images/environments/parede-creme.svg'},
+  {id:'parede-madeira',name:'Parede Madeira',image:'images/environments/parede-madeira.svg'},
+  {id:'parede-cinza',name:'Parede Cinzenta Elegante',image:'images/environments/parede-cinza.svg'},
+  {id:'parede-tijolo',name:'Tijolo à Vista',image:'images/environments/parede-tijolo.svg'},
+];
+const ROOM_ENVS = [
+  {id:'sala',name:'Sala de Estar',image:'images/environments/sala.svg'},
+  {id:'cozinha',name:'Cozinha Moderna',image:'images/environments/cozinha.svg'},
+  {id:'banheiro',name:'Casa de Banho Luxo',image:'images/environments/banheiro.svg'},
+];
+
+// ── Storage helpers ──
+function seed(key, def){ if(!localStorage.getItem(key)) localStorage.setItem(key,JSON.stringify(def)); }
+function load(key){ try{return JSON.parse(localStorage.getItem(key))||[];}catch{return [];} }
+function save(key,val){ localStorage.setItem(key,JSON.stringify(val)); }
+
+seed('nhamat_glasses', DEFAULT_GLASSES);
+seed('nhamat_frames', DEFAULT_FRAMES);
+
+function getGlasses(){ return load('nhamat_glasses'); }
+function getFrames(){ return load('nhamat_frames'); }
+
+function genId(prefix){
+  return prefix+'-'+Date.now().toString(36).toUpperCase()+Math.random().toString(36).substr(2,3).toUpperCase();
+}
+
+// ═══════════════════════════════════════════════
+// NAVIGATION
+// ═══════════════════════════════════════════════
+let currentScreen = 'home';
+
+function showScreen(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById('screen-'+name).classList.add('active');
+  document.querySelectorAll('.nav-link').forEach(l=>l.classList.remove('active'));
+  const nl = document.getElementById('nl-'+name);
+  if(nl) nl.classList.add('active');
+  currentScreen = name;
+  window.scrollTo(0,0);
+  document.getElementById('navLinks').classList.remove('open');
+  document.getElementById('burger').classList.remove('open');
+
+  if(name==='oculos') renderGlassesPage();
+  if(name==='quadros') renderFramesPage();
+  if(name==='tryon') renderTryonSidebar();
+  if(name==='simulator') renderSimSidebar();
+  if(name==='admin') renderAdmin();
+}
+
+function toggleMenu(){
+  document.getElementById('navLinks').classList.toggle('open');
+  document.getElementById('burger').classList.toggle('open');
+}
+
+// scroll nav
+window.addEventListener('scroll',()=>{
+  document.getElementById('navbar').classList.toggle('scrolled', window.scrollY>40);
+});
+
+// year
+document.getElementById('yr').textContent = new Date().getFullYear();
+
+// ═══════════════════════════════════════════════
+// GLASSES PAGE
+// ═══════════════════════════════════════════════
+let glassFilter = 'Todos';
+
+function renderGlassesPage(){
+  const glasses = getGlasses();
+  const cats = ['Todos',...new Set(glasses.map(g=>g.category))];
+
+  const fb = document.getElementById('glasses-filters');
+  fb.innerHTML = cats.map(c=>`<button class="filter-btn${glassFilter===c?' active':''}" onclick="setGlassFilter('${c}')">${c}</button>`).join('');
+
+  const filtered = glassFilter==='Todos' ? glasses : glasses.filter(g=>g.category===glassFilter);
+  const grid = document.getElementById('glasses-grid');
+  grid.innerHTML = filtered.map(g=>`
+    <div class="product-card">
+      <div class="product-img-wrap">
+        <img src="${g.image}" alt="${g.name}" class="product-img"/>
+        ${!g.stock?'<div class="oos-badge">Esgotado</div>':''}
+        <div class="product-overlay"><button class="btn btn-primary btn-sm" onclick="goTryon('${g.id}')">Experimentar ▶</button></div>
+      </div>
+      <div class="product-info">
+        <div class="product-top">
+          <div><div class="product-ref">${g.id}</div><div class="product-name">${g.name}</div><div class="product-cat">${g.category}</div></div>
+          <div class="product-price">${g.price}</div>
+        </div>
+        <div class="product-actions">
+          <button class="btn btn-outline btn-sm" onclick="goTryon('${g.id}')">Try-On Ao Vivo</button>
+          <button class="btn btn-wa btn-sm" onclick="buyWA('${g.id}','glass')">${waIcon()} Comprar</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function setGlassFilter(cat){ glassFilter=cat; renderGlassesPage(); }
+
+// ═══════════════════════════════════════════════
+// FRAMES PAGE
+// ═══════════════════════════════════════════════
+let frameFilter = 'Todos';
+
+function renderFramesPage(){
+  const frames = getFrames();
+  const cats = ['Todos',...new Set(frames.map(f=>f.category))];
+
+  const fb = document.getElementById('frames-filters');
+  fb.innerHTML = cats.map(c=>`<button class="filter-btn${frameFilter===c?' active':''}" onclick="setFrameFilter('${c}')">${c}</button>`).join('');
+
+  const filtered = frameFilter==='Todos' ? frames : frames.filter(f=>f.category===frameFilter);
+  const grid = document.getElementById('frames-grid');
+  grid.innerHTML = filtered.map(f=>`
+    <div class="product-card">
+      <div class="product-img-wrap product-img-frame">
+        <img src="${f.image}" alt="${f.name}" class="product-img product-img-inner"/>
+        ${!f.stock?'<div class="oos-badge">Esgotado</div>':''}
+        <div class="product-overlay"><button class="btn btn-primary btn-sm" onclick="goSimulator('${f.id}')">Simular Ambiente →</button></div>
+      </div>
+      <div class="product-info">
+        <div class="product-top">
+          <div><div class="product-ref">${f.id}</div><div class="product-name">${f.name}</div><div class="product-cat">${f.category} · ${f.dimensions||'—'}</div></div>
+          <div class="product-price">${f.price}</div>
+        </div>
+        <div class="product-actions">
+          <button class="btn btn-outline btn-sm" onclick="goSimulator('${f.id}')">Simular Ambiente</button>
+          <button class="btn btn-wa btn-sm" onclick="buyWA('${f.id}','frame')">${waIcon()} Comprar</button>
+        </div>
+      </div>
+    </div>`).join('');
+}
+
+function setFrameFilter(cat){ frameFilter=cat; renderFramesPage(); }
+
+// ═══════════════════════════════════════════════
+// WHATSAPP
+// ═══════════════════════════════════════════════
+function waIcon(){ return '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/></svg>'; }
+
+function buyWA(id, type){
+  const list = type==='glass' ? getGlasses() : getFrames();
+  const item = list.find(x=>x.id===id);
+  if(!item) return;
+  const msg = `Olá! Tenho interesse no produto *${item.name}* (Ref: ${item.id}) — ${item.price}. Pode dar mais informações?`;
+  window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
+// ═══════════════════════════════════════════════
+// TRY-ON
+// ═══════════════════════════════════════════════
+let tryonSelected = null;
+let tryonStream = null;
+let tryonFaceMesh = null;
+let tryonMPCamera = null;
+let tryonLastLm = null;
+
+function goTryon(id){
+  const glasses = getGlasses();
+  tryonSelected = glasses.find(g=>g.id===id) || glasses[0];
+  showScreen('tryon');
+}
+
+function renderTryonSidebar(){
+  const glasses = getGlasses();
+  if(!tryonSelected) tryonSelected = glasses[0];
+
+  document.getElementById('tryon-selector').innerHTML = glasses.map(g=>`
+    <div class="selector-item${tryonSelected&&tryonSelected.id===g.id?' active':''}" onclick="selectGlass('${g.id}')">
+      <img src="${g.image}" alt="${g.name}"/>
+      <span>${g.name}</span>
+    </div>`).join('');
+
+  updateTryonInfo();
+}
+
+function selectGlass(id){
+  tryonSelected = getGlasses().find(g=>g.id===id);
+  renderTryonSidebar();
+}
+
+function updateTryonInfo(){
+  if(!tryonSelected) return;
+  document.getElementById('tryon-info').innerHTML = `
+    <div class="product-ref">${tryonSelected.id}</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:21px;color:#fff;margin:4px 0">${tryonSelected.name}</div>
+    <div style="color:var(--gold-l);font-family:'Cormorant Garamond',serif;font-size:20px">${tryonSelected.price}</div>
+    <button class="btn btn-wa" style="width:100%;margin-top:14px" onclick="buyWA('${tryonSelected.id}','glass')">${waIcon()} Tenho Interesse</button>`;
+}
+
+async function startCamera(){
+  _show('tryon-start',false); _show('tryon-result',false); _show('tryon-error',false);
+  _show('tryon-video-wrap',true); _show('tryon-loading',true); _show('tryon-controls',false);
+  tryonLastLm = null;
+  try{
+    const stream = await navigator.mediaDevices.getUserMedia({video:{facingMode:'user',width:{ideal:640},height:{ideal:480}}});
+    tryonStream = stream;
+    const video = document.getElementById('tryon-video');
+    video.srcObject = stream;
+    await video.play();
+    video.addEventListener('loadedmetadata',()=>{
+      const c = document.getElementById('tryon-canvas');
+      c.width = video.videoWidth; c.height = video.videoHeight;
+    });
+    initFaceMesh(video);
+  }catch(e){
+    console.error(e);
+    _show('tryon-video-wrap',false);
+    _show('tryon-error',true);
+  }
+}
+
+function initFaceMesh(video){
+  if(!window.FaceMesh){ _show('tryon-error',true); return; }
+  const fm = new window.FaceMesh({locateFile:f=>`https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh/${f}`});
+  fm.setOptions({maxNumFaces:1,refineLandmarks:true,minDetectionConfidence:0.5,minTrackingConfidence:0.5});
+  fm.onResults(onFaceResults);
+  tryonFaceMesh = fm;
+  if(!window.Camera){ _show('tryon-error',true); return; }
+  const cam = new window.Camera(video,{
+    onFrame: async()=>{ if(tryonFaceMesh) await tryonFaceMesh.send({image:video}); },
+    width:640, height:480
+  });
+  cam.start();
+  tryonMPCamera = cam;
+}
+
+function onFaceResults(results){
+  _show('tryon-loading',false); _show('tryon-controls',true);
+  const canvas = document.getElementById('tryon-canvas');
+  const video = document.getElementById('tryon-video');
+  canvas.width = video.videoWidth||640; canvas.height = video.videoHeight||480;
+  const ctx = canvas.getContext('2d');
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  if(!results.multiFaceLandmarks||!results.multiFaceLandmarks.length) return;
+  tryonLastLm = results.multiFaceLandmarks[0];
+  drawGlasses(ctx, tryonLastLm, canvas.width, canvas.height, tryonSelected);
+}
+
+function stopCamera(){
+  if(tryonMPCamera){try{tryonMPCamera.stop();}catch{} tryonMPCamera=null;}
+  if(tryonFaceMesh){try{tryonFaceMesh.close();}catch{} tryonFaceMesh=null;}
+  if(tryonStream){tryonStream.getTracks().forEach(t=>t.stop()); tryonStream=null;}
+  tryonLastLm = null;
+  _show('tryon-video-wrap',false); _show('tryon-controls',false);
+  _show('tryon-start',true);
+}
+
+function takePhoto(){
+  const video = document.getElementById('tryon-video');
+  const W = video.videoWidth||640, H = video.videoHeight||480;
+  const tmp = document.createElement('canvas');
+  tmp.width=W; tmp.height=H;
+  const c = tmp.getContext('2d');
+  c.save(); c.translate(W,0); c.scale(-1,1); c.drawImage(video,0,0,W,H); c.restore();
+  if(tryonLastLm && tryonSelected) drawGlasses(c,tryonLastLm,W,H,tryonSelected);
+  const url = tmp.toDataURL('image/png');
+  document.getElementById('result-img').src = url;
+  window._resultUrl = url;
+  stopCamera();
+  _show('tryon-video-wrap',false); _show('tryon-controls',false); _show('tryon-start',false);
+  _show('tryon-result',true);
+}
+
+function downloadPhoto(){
+  const a = document.createElement('a');
+  a.href = window._resultUrl;
+  a.download = `nhamat-${tryonSelected?tryonSelected.id:'oculos'}.png`;
+  a.click();
+}
+
+function resetTryon(){
+  _show('tryon-result',false);
+  _show('tryon-start',true);
+}
+
+// ── DRAW GLASSES ──
+function drawGlasses(ctx, lm, W, H, glass){
+  if(!glass||!lm) return;
+  const p = i=>({x:lm[i].x*W, y:lm[i].y*H});
+  const lo=p(33), ro=p(263), nb=p(168);
+  const gw = Math.abs(ro.x-lo.x)*1.6;
+  const gh = gw*0.4;
+  const cx=(lo.x+ro.x)/2, cy=nb.y+gh*0.05;
+  const angle=Math.atan2(ro.y-lo.y, ro.x-lo.x);
+  ctx.save(); ctx.translate(cx,cy); ctx.rotate(angle);
+  const shape = GLASS_SHAPES[glass.name]||'round';
+  const color = GLASS_COLORS[glass.name]||'#C9930A';
+  const lw = Math.max(2,gw*0.008);
+  ctx.strokeStyle=color; ctx.lineWidth=lw; ctx.lineCap='round'; ctx.lineJoin='round';
+  _drawShape(ctx, shape, gw, gh, color, lw);
+  ctx.restore();
+}
+
+function _drawShape(ctx,shape,gw,gh,color,lw){
+  const lx=-gw*0.28, rx=gw*0.28, lw2=gw*0.22, lh=gh*0.52;
+  switch(shape){
+    case 'aviator':
+      // left teardrop
+      ctx.beginPath(); ctx.moveTo(lx,0-lh*.5);
+      ctx.bezierCurveTo(lx+lw2,0-lh*.62,lx+lw2,0+lh*.55,lx,0+lh*.42);
+      ctx.bezierCurveTo(lx-lw2,0+lh*.55,lx-lw2,0-lh*.62,lx,0-lh*.5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(rx,0-lh*.5);
+      ctx.bezierCurveTo(rx+lw2,0-lh*.62,rx+lw2,0+lh*.55,rx,0+lh*.42);
+      ctx.bezierCurveTo(rx-lw2,0+lh*.55,rx-lw2,0-lh*.62,rx,0-lh*.5); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(lx+lw2*.6,0-lh*.08); ctx.lineTo(rx-lw2*.6,0-lh*.08); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(lx-lw2,0); ctx.lineTo(-gw*.52,0-lh*.12); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(rx+lw2,0); ctx.lineTo(gw*.52,0-lh*.12); ctx.stroke();
+      break;
+    case 'square':
+      _rr(ctx,lx-lw2,0-lh*.55,lw2*2,lh*1.1,lh*.1); ctx.stroke();
+      _rr(ctx,rx-lw2,0-lh*.55,lw2*2,lh*1.1,lh*.1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(lx+lw2,0); ctx.lineTo(rx-lw2,0); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(lx-lw2,0); ctx.lineTo(-gw*.52,0-lh*.15); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(rx+lw2,0); ctx.lineTo(gw*.52,0-lh*.15); ctx.stroke();
+      break;
+    case 'round': case 'minimal':{
+      const r = shape==='minimal'?gw*.19:gw*.2;
+      ctx.lineWidth = shape==='minimal'?Math.max(1.5,gw*.006):lw;
+      ctx.beginPath(); ctx.ellipse(lx,0,r,r*.95,0,0,Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.ellipse(rx,0,r,r*.95,0,0,Math.PI*2); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(lx+r,0); ctx.lineTo(rx-r,0); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(lx-r,0-r*.15); ctx.lineTo(-gw*.52,0-r*.3); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(rx+r,0-r*.15); ctx.lineTo(gw*.52,0-r*.3); ctx.stroke();
+      break;}
+    case 'cateye':
+      ctx.beginPath(); ctx.moveTo(lx-lw2,0+lh*.4);
+      ctx.bezierCurveTo(lx-lw2*1.1,0-lh*.2,lx-lw2*.3,0-lh*.85,lx+lw2*.7,0-lh*.7);
+      ctx.bezierCurveTo(lx+lw2,0-lh*.5,lx+lw2,0+lh*.2,lx+lw2*.5,0+lh*.5);
+      ctx.bezierCurveTo(lx,0+lh*.65,lx-lw2*.5,0+lh*.6,lx-lw2,0+lh*.4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(rx+lw2,0+lh*.4);
+      ctx.bezierCurveTo(rx+lw2*1.1,0-lh*.2,rx+lw2*.3,0-lh*.85,rx-lw2*.7,0-lh*.7);
+      ctx.bezierCurveTo(rx-lw2,0-lh*.5,rx-lw2,0+lh*.2,rx-lw2*.5,0+lh*.5);
+      ctx.bezierCurveTo(rx,0+lh*.65,rx+lw2*.5,0+lh*.6,rx+lw2,0+lh*.4); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(lx+lw2*.5,0-lh*.1); ctx.lineTo(rx-lw2*.5,0-lh*.1); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(lx-lw2,0+lh*.4); ctx.lineTo(-gw*.52,0); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(rx+lw2,0+lh*.4); ctx.lineTo(gw*.52,0); ctx.stroke();
+      break;
+    case 'wrap':
+      ctx.lineWidth=Math.max(2.5,gw*.01);
+      ctx.beginPath();
+      ctx.moveTo(-gw*.5,0-lh*.6);
+      ctx.bezierCurveTo(-gw*.2,0-lh*.75,-gw*.06,0-lh*.65,0,0-lh*.3);
+      ctx.bezierCurveTo(gw*.06,0-lh*.65,gw*.2,0-lh*.75,gw*.5,0-lh*.6);
+      ctx.bezierCurveTo(gw*.5,0+lh*.4,gw*.2,0+lh*.5,0,0+lh*.45);
+      ctx.bezierCurveTo(-gw*.2,0+lh*.5,-gw*.5,0+lh*.4,-gw*.5,0-lh*.6); ctx.stroke();
+      ctx.strokeStyle='#C9930A'; ctx.lineWidth=Math.max(1.5,gw*.006);
+      ctx.beginPath(); ctx.moveTo(-gw*.05,0-lh*.42); ctx.lineTo(gw*.05,0-lh*.42); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(-gw*.5,0-lh*.6); ctx.lineTo(-gw*.55,0-lh*.7); ctx.stroke();
+      ctx.beginPath(); ctx.moveTo(gw*.5,0-lh*.6); ctx.lineTo(gw*.55,0-lh*.7); ctx.stroke();
+      break;
+  }
+}
+
+function _rr(ctx,x,y,w,h,r){
+  ctx.beginPath(); ctx.moveTo(x+r,y); ctx.lineTo(x+w-r,y);
+  ctx.quadraticCurveTo(x+w,y,x+w,y+r); ctx.lineTo(x+w,y+h-r);
+  ctx.quadraticCurveTo(x+w,y+h,x+w-r,y+h); ctx.lineTo(x+r,y+h);
+  ctx.quadraticCurveTo(x,y+h,x,y+h-r); ctx.lineTo(x,y+r);
+  ctx.quadraticCurveTo(x,y,x+r,y); ctx.closePath();
+}
+
+// ═══════════════════════════════════════════════
+// SIMULATOR
+// ═══════════════════════════════════════════════
+let simSelected = null;
+let simMode = null;
+let simEnv = null;
+
+function goSimulator(id){
+  const frames = getFrames();
+  simSelected = frames.find(f=>f.id===id)||frames[0];
+  simMode=null; simEnv=null;
+  showScreen('simulator');
+}
+
+function renderSimSidebar(){
+  const frames = getFrames();
+  if(!simSelected) simSelected=frames[0];
+  document.getElementById('sim-selector').innerHTML = frames.map(f=>`
+    <div class="frame-thumb${simSelected&&simSelected.id===f.id?' active':''}" onclick="selectFrame('${f.id}')">
+      <img src="${f.image}" alt="${f.name}"/>
+      <span>${f.name}</span>
+    </div>`).join('');
+  updateSimInfo();
+}
+
+function selectFrame(id){
+  simSelected = getFrames().find(f=>f.id===id);
+  simEnv=null;
+  renderSimSidebar();
+  if(simEnv) simRender();
+}
+
+function updateSimInfo(){
+  if(!simSelected) return;
+  document.getElementById('sim-info').innerHTML = `
+    <div style="font-size:9px;letter-spacing:2px;color:var(--dim)">${simSelected.id}</div>
+    <div style="font-family:'Cormorant Garamond',serif;font-size:21px;color:#fff;margin:4px 0">${simSelected.name}</div>
+    <div style="font-size:10px;color:var(--muted)">${simSelected.category||''} · ${simSelected.dimensions||'—'}</div>
+    <div style="color:var(--gold-l);font-family:'Cormorant Garamond',serif;font-size:20px;margin-top:4px">${simSelected.price}</div>
+    <button class="btn btn-wa" style="width:100%;margin-top:14px" onclick="buyWA('${simSelected.id}','frame')">${waIcon()} Tenho Interesse</button>`;
+}
+
+function simSetMode(mode){
+  simMode=mode; simEnv=null;
+  _show('sim-mode-select',false);
+  _show('sim-env-select',true);
+  _show('sim-render',false);
+  document.getElementById('sim-env-title').textContent = mode==='wall'?'Escolha a parede':'Escolha o compartimento';
+  const envs = mode==='wall'?WALL_ENVS:ROOM_ENVS;
+  document.getElementById('sim-env-grid').innerHTML = envs.map(e=>`
+    <div class="env-thumb" onclick="simPickEnv('${e.id}')">
+      <img src="${e.image}" alt="${e.name}"/>
+      <span>${e.name}</span>
+    </div>`).join('');
+}
+
+function simBackToMode(){ simMode=null; simEnv=null; _show('sim-mode-select',true); _show('sim-env-select',false); _show('sim-render',false); }
+function simBackToEnv(){ _show('sim-env-select',true); _show('sim-render',false); }
+function simReset(){ simMode=null; simEnv=null; _show('sim-mode-select',true); _show('sim-env-select',false); _show('sim-render',false); }
+
+function simPickEnv(id){
+  const all=[...WALL_ENVS,...ROOM_ENVS];
+  simEnv = all.find(e=>e.id===id);
+  _show('sim-env-select',false);
+  _show('sim-render',true);
+  document.getElementById('sim-env-name').textContent = simEnv.name;
+  document.getElementById('sim-render-wrap').innerHTML = '<div class="render-loading"><div class="spinner"></div><p>A gerar simulação…</p></div>';
+  simRender();
+}
+
+async function simRender(){
+  if(!simEnv||!simSelected) return;
+  const canvas = document.getElementById('sim-canvas');
+  const W=900,H=560; canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+
+  await drawImgToCanvas(ctx,simEnv.image,0,0,W,H);
+
+  const fW=160, fH=Math.round(fW*1.33);
+  const fX=(W-fW)/2, fY=(H-fH)/2-30;
+  ctx.save(); ctx.shadowColor='rgba(0,0,0,.55)'; ctx.shadowBlur=32; ctx.shadowOffsetX=8; ctx.shadowOffsetY=16;
+  ctx.fillStyle='#000'; ctx.fillRect(fX,fY,fW,fH); ctx.restore();
+  await drawImgToCanvas(ctx,simSelected.image,fX,fY,fW,fH);
+
+  const url=canvas.toDataURL('image/png');
+  window._simUrl=url;
+  document.getElementById('sim-render-wrap').innerHTML=`<img src="${url}" class="render-img" alt="Simulação"/>`;
+}
+
+function drawImgToCanvas(ctx,url,x,y,w,h){
+  return new Promise(res=>{
+    const img=new Image(); img.crossOrigin='anonymous';
+    img.onload=()=>{ctx.drawImage(img,x,y,w,h);res();};
+    img.onerror=res; img.src=url;
+  });
+}
+
+function simDownload(){
+  if(!window._simUrl) return;
+  const a=document.createElement('a'); a.href=window._simUrl;
+  a.download=`nhamat-simulacao-${simSelected?simSelected.id:'quadro'}.png`; a.click();
+}
+
+// ═══════════════════════════════════════════════
+// ADMIN
+// ═══════════════════════════════════════════════
+let adminTab = 'glasses';
+
+function adminLogin(){
+  const pw=document.getElementById('admin-pw').value;
+  if(pw===ADMIN_PASS){
+    sessionStorage.setItem('nhamat_auth','1');
+    renderAdmin();
+  } else {
+    const e=document.getElementById('login-error'); e.style.display='block';
+    setTimeout(()=>e.style.display='none',2500);
+  }
+}
+
+function adminLogout(){
+  sessionStorage.removeItem('nhamat_auth');
+  document.getElementById('admin-pw').value='';
+  renderAdmin();
+}
+
+function renderAdmin(){
+  const auth = sessionStorage.getItem('nhamat_auth')==='1';
+  document.getElementById('admin-login-panel').style.display = auth?'none':'block';
+  document.getElementById('admin-dashboard').style.display = auth?'block':'none';
+  if(auth) renderDashboard();
+}
+
+function renderDashboard(){
+  const glasses=getGlasses(), frames=getFrames();
+  document.getElementById('admin-stats').innerHTML=`
+    <div class="stat-card"><div class="stat-num">${glasses.length}</div><div class="stat-label">Óculos</div></div>
+    <div class="stat-card"><div class="stat-num">${frames.length}</div><div class="stat-label">Quadros</div></div>
+    <div class="stat-card"><div class="stat-num">${glasses.filter(g=>g.stock).length+frames.filter(f=>f.stock).length}</div><div class="stat-label">Em stock</div></div>`;
+  document.getElementById('tab-glasses').classList.toggle('active',adminTab==='glasses');
+  document.getElementById('tab-frames').classList.toggle('active',adminTab==='frames');
+  document.getElementById('admin-add-btn').textContent=`+ Adicionar ${adminTab==='glasses'?'óculos':'quadro'}`;
+  const items = adminTab==='glasses'?glasses:frames;
+  const isF = adminTab==='frames';
+  document.getElementById('admin-thead').innerHTML=`<tr>
+    <th>Imagem</th><th>ID</th><th>Nome</th><th>Categoria</th>${isF?'<th>Dim.</th>':''}
+    <th>Preço</th><th>Stock</th><th>Ações</th></tr>`;
+  document.getElementById('admin-tbody').innerHTML=items.map(item=>`
+    <tr>
+      <td><img src="${item.image}" class="table-thumb" alt="${item.name}"/></td>
+      <td class="id-cell">${item.id}</td>
+      <td>${item.name}</td>
+      <td><span style="font-size:9px;letter-spacing:2px;text-transform:uppercase;color:var(--muted)">${item.category}</span></td>
+      ${isF?`<td style="font-size:12px;color:var(--muted)">${item.dimensions||'—'}</td>`:''}
+      <td style="font-family:'Cormorant Garamond',serif;font-size:18px;color:var(--gold-l)">${item.price}</td>
+      <td><button class="stock-btn ${item.stock?'stock-in':'stock-out'}" onclick="adminToggleStock('${item.id}')">${item.stock?'Em stock':'Esgotado'}</button></td>
+      <td><button class="del-btn" onclick="adminDelete('${item.id}')">Apagar</button></td>
+    </tr>`).join('');
+}
+
+function adminSetTab(tab){ adminTab=tab; renderDashboard(); }
+
+function adminToggleStock(id){
+  const key = adminTab==='glasses'?'nhamat_glasses':'nhamat_frames';
+  const items = load(key).map(x=>x.id===id?{...x,stock:!x.stock}:x);
+  save(key,items); renderDashboard();
+}
+
+function adminDelete(id){
+  if(!confirm('Apagar este produto?')) return;
+  const key = adminTab==='glasses'?'nhamat_glasses':'nhamat_frames';
+  const items = load(key).filter(x=>x.id!==id);
+  save(key,items); renderDashboard(); showToast('Produto removido.');
+}
+
+let _imgPreview=null;
+
+function openAddModal(){
+  document.getElementById('f-name').value='';
+  document.getElementById('f-cat').value='';
+  document.getElementById('f-price').value='';
+  document.getElementById('f-dim').value='';
+  document.getElementById('f-img').value='';
+  _imgPreview=null;
+  _show('f-preview',false);
+  document.getElementById('modal-title').textContent=`Adicionar ${adminTab==='glasses'?'óculos':'quadro'}`;
+  document.getElementById('f-dim-group').style.display=adminTab==='frames'?'block':'none';
+  _show('product-modal',true);
+}
+
+function closeModal(){ _show('product-modal',false); }
+
+function previewImg(input){
+  const file=input.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=e=>{
+    _imgPreview=e.target.result;
+    document.getElementById('f-preview-img').src=_imgPreview;
+    _show('f-preview',true);
+  };
+  reader.readAsDataURL(file);
+}
+
+function saveProduct(){
+  const name=document.getElementById('f-name').value.trim();
+  const cat=document.getElementById('f-cat').value.trim();
+  const price=document.getElementById('f-price').value.trim();
+  if(!name||!cat||!price){alert('Preencha nome, categoria e preço.');return;}
+  const priceF = price.includes('€')?price:price+'€';
+  const key = adminTab==='glasses'?'nhamat_glasses':'nhamat_frames';
+  const prefix = adminTab==='glasses'?'OCU':'QUA';
+  const fallback = adminTab==='glasses'?'images/glasses/oculos-001.svg':'images/frames/quadro-001.svg';
+  const item={
+    id:genId(prefix), name, category:cat, price:priceF,
+    image:_imgPreview||fallback, stock:true,
+    createdAt:new Date().toISOString(),
+  };
+  if(adminTab==='frames') item.dimensions=document.getElementById('f-dim').value.trim()||'—';
+  const items=load(key); items.push(item); save(key,items);
+  closeModal(); renderDashboard(); showToast('Produto adicionado!');
+}
+
+// ═══════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════
+function _show(id,visible){
+  const el=document.getElementById(id);
+  if(!el) return;
+  if(visible) el.classList.remove('hidden');
+  else el.classList.add('hidden');
+}
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.remove('hidden');
+  setTimeout(()=>t.classList.add('hidden'),3000);
+}
+</script>
+</body>
+</html>

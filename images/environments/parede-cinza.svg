@@ -1,0 +1,18 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 500" width="800" height="500">
+      <defs>
+        <linearGradient id="wall3" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#3a3a3a"/>
+          <stop offset="100%" style="stop-color:#2a2a2a"/>
+        </linearGradient>
+      </defs>
+      <rect width="800" height="500" fill="url(#wall3)"/>
+      <!-- Subtle panels -->
+      <rect x="40" y="40" width="720" height="360" fill="none" stroke="#444" stroke-width="1" opacity="0.5"/>
+      <rect x="60" y="60" width="680" height="320" fill="none" stroke="#484848" stroke-width="0.5" opacity="0.4"/>
+      <!-- Floor marble -->
+      <rect x="0" y="420" width="800" height="80" fill="#e8e4de"/>
+      <line x1="0" y1="420" x2="800" y2="420" stroke="#c0bab4" stroke-width="2"/>
+      <!-- Marble veins -->
+      <path d="M100,430 Q200,440 300,425 Q400,415 500,435" stroke="#c0bab4" stroke-width="0.5" fill="none" opacity="0.6"/>
+      <path d="M200,460 Q350,455 450,470 Q550,480 650,460" stroke="#c0bab4" stroke-width="0.5" fill="none" opacity="0.4"/>
+    </svg>
