@@ -588,20 +588,20 @@ const GLASS_COLORS = {
 };
 
 const DEFAULT_GLASSES = [
-  {id:'oculos-001',name:'Aviador Dourado',price:'89 Kz',category:'Clássico',image:'images/glasses/oculos-001.svg',stock:true},
-  {id:'oculos-002',name:'Quadrado Urbano',price:'75 Kz',category:'Moderno',image:'images/glasses/oculos-002.svg',stock:true},
-  {id:'oculos-003',name:'Cat-Eye Élégance',price:'110 Kz',category:'Feminino',image:'images/glasses/oculos-003.svg',stock:true},
-  {id:'oculos-004',name:'Round Vintage',price:'95 Kz',category:'Vintage',image:'images/glasses/oculos-004.svg',stock:true},
-  {id:'oculos-005',name:'Sport Titanium',price:'130 Kz',category:'Desportivo',image:'images/glasses/oculos-005.svg',stock:true},
-  {id:'oculos-006',name:'Minimal Prata',price:'85 Kz',category:'Minimalista',image:'images/glasses/oculos-006.svg',stock:true},
+  {id:'oculos-001',name:'Aviador Dourado',price:'81.900 Kz',category:'Clássico',image:'images/glasses/oculos-001.svg',stock:true},
+  {id:'oculos-002',name:'Quadrado Urbano',price:'69.000 Kz',category:'Moderno',image:'images/glasses/oculos-002.svg',stock:true},
+  {id:'oculos-003',name:'Cat-Eye Élégance',price:'101.200 Kz',category:'Feminino',image:'images/glasses/oculos-003.svg',stock:true},
+  {id:'oculos-004',name:'Round Vintage',price:'87.400 Kz',category:'Vintage',image:'images/glasses/oculos-004.svg',stock:true},
+  {id:'oculos-005',name:'Sport Titanium',price:'119.600 Kz',category:'Desportivo',image:'images/glasses/oculos-005.svg',stock:true},
+  {id:'oculos-006',name:'Minimal Prata',price:'78.200 Kz',category:'Minimalista',image:'images/glasses/oculos-006.svg',stock:true},
 ];
 const DEFAULT_FRAMES = [
-  {id:'quadro-001',name:'Abstrato Dourado',price:'180 Kz',category:'Abstrato',dimensions:'60×80cm',image:'images/frames/quadro-001.svg',stock:true},
-  {id:'quadro-002',name:'Botânico Premium',price:'220 Kz',category:'Natureza',dimensions:'50×70cm',image:'images/frames/quadro-002.svg',stock:true},
-  {id:'quadro-003',name:'Geométrico Azul',price:'160 Kz',category:'Geométrico',dimensions:'60×60cm',image:'images/frames/quadro-003.svg',stock:true},
-  {id:'quadro-004',name:'Minimalista Negro',price:'195 Kz',category:'Minimalista',dimensions:'40×60cm',image:'images/frames/quadro-004.svg',stock:true},
-  {id:'quadro-005',name:'Pôr do Sol',price:'240 Kz',category:'Paisagem',dimensions:'80×60cm',image:'images/frames/quadro-005.svg',stock:true},
-  {id:'quadro-006',name:'Mapa de Lisboa',price:'210 Kz',category:'Cidade',dimensions:'70×90cm',image:'images/frames/quadro-006.svg',stock:true},
+  {id:'quadro-001',name:'Abstrato Dourado',price:'165.600 Kz',category:'Abstrato',dimensions:'60×80cm',image:'images/frames/quadro-001.svg',stock:true},
+  {id:'quadro-002',name:'Botânico Premium',price:'202.400 Kz',category:'Natureza',dimensions:'50×70cm',image:'images/frames/quadro-002.svg',stock:true},
+  {id:'quadro-003',name:'Geométrico Azul',price:'147.200 Kz',category:'Geométrico',dimensions:'60×60cm',image:'images/frames/quadro-003.svg',stock:true},
+  {id:'quadro-004',name:'Minimalista Negro',price:'179.400 Kz',category:'Minimalista',dimensions:'40×60cm',image:'images/frames/quadro-004.svg',stock:true},
+  {id:'quadro-005',name:'Pôr do Sol',price:'220.800 Kz',category:'Paisagem',dimensions:'80×60cm',image:'images/frames/quadro-005.svg',stock:true},
+  {id:'quadro-006',name:'Mapa de Lisboa',price:'193.200 Kz',category:'Cidade',dimensions:'70×90cm',image:'images/frames/quadro-006.svg',stock:true},
 ];
 const WALL_ENVS = [
   {id:'parede-branca',name:'Parede Branca Lisa',image:'images/environments/parede-branca.svg'},
@@ -620,6 +620,14 @@ const ROOM_ENVS = [
 function seed(key, def){ if(!localStorage.getItem(key)) localStorage.setItem(key,JSON.stringify(def)); }
 function load(key){ try{return JSON.parse(localStorage.getItem(key))||[];}catch{return [];} }
 function save(key,val){ localStorage.setItem(key,JSON.stringify(val)); }
+
+// Reset data if version changed (forces new prices to load)
+const DATA_VERSION = '2';
+if(localStorage.getItem('nhamat_version')!==DATA_VERSION){
+  localStorage.removeItem('nhamat_glasses');
+  localStorage.removeItem('nhamat_frames');
+  localStorage.setItem('nhamat_version',DATA_VERSION);
+}
 
 seed('nhamat_glasses', DEFAULT_GLASSES);
 seed('nhamat_frames', DEFAULT_FRAMES);
@@ -748,7 +756,8 @@ function buyWA(id, type){
   const list = type==='glass' ? getGlasses() : getFrames();
   const item = list.find(x=>x.id===id);
   if(!item) return;
-  const msg = `Olá! Tenho interesse no produto *${item.name}* (Ref: ${item.id}) — ${item.price}. Pode dar mais informações?`;
+  const tipo = type==='glass' ? 'óculos' : 'quadro decorativo';
+  const msg = `Olá, bom dia! 😊\n\nVisitei o site da NHAMAT e tenho interesse no seguinte ${tipo}:\n\n👉 *${item.name}*\n📌 Ref: ${item.id}\n💰 Preço: ${item.price}\n\nPoderiam indicar a disponibilidade e as opções de pagamento?\n\nObrigado/a e até breve! 🙏`;
   window.open(`https://wa.me/${WHATSAPP}?text=${encodeURIComponent(msg)}`,'_blank');
 }
 
@@ -967,7 +976,7 @@ function _rr(ctx,x,y,w,h,r){
 }
 
 // ═══════════════════════════════════════════════
-// SIMULATOR
+// SIMULATOR — renderização HTML (sem CORS)
 // ═══════════════════════════════════════════════
 let simSelected = null;
 let simMode = null;
@@ -993,9 +1002,8 @@ function renderSimSidebar(){
 
 function selectFrame(id){
   simSelected = getFrames().find(f=>f.id===id);
-  simEnv=null;
   renderSimSidebar();
-  if(simEnv) simRender();
+  if(simEnv) simShowResult();
 }
 
 function updateSimInfo(){
@@ -1023,50 +1031,63 @@ function simSetMode(mode){
 }
 
 function simBackToMode(){ simMode=null; simEnv=null; _show('sim-mode-select',true); _show('sim-env-select',false); _show('sim-render',false); }
-function simBackToEnv(){ _show('sim-env-select',true); _show('sim-render',false); }
+function simBackToEnv(){ simEnv=null; _show('sim-env-select',true); _show('sim-render',false); }
 function simReset(){ simMode=null; simEnv=null; _show('sim-mode-select',true); _show('sim-env-select',false); _show('sim-render',false); }
 
 function simPickEnv(id){
   const all=[...WALL_ENVS,...ROOM_ENVS];
   simEnv = all.find(e=>e.id===id);
+  if(!simEnv) return;
   _show('sim-env-select',false);
   _show('sim-render',true);
   document.getElementById('sim-env-name').textContent = simEnv.name;
-  document.getElementById('sim-render-wrap').innerHTML = '<div class="render-loading"><div class="spinner"></div><p>A gerar simulação…</p></div>';
-  simRender();
+  simShowResult();
 }
 
-async function simRender(){
+function simShowResult(){
   if(!simEnv||!simSelected) return;
-  const canvas = document.getElementById('sim-canvas');
-  const W=900,H=560; canvas.width=W; canvas.height=H;
-  const ctx=canvas.getContext('2d');
-
-  await drawImgToCanvas(ctx,simEnv.image,0,0,W,H);
-
-  const fW=160, fH=Math.round(fW*1.33);
-  const fX=(W-fW)/2, fY=(H-fH)/2-30;
-  ctx.save(); ctx.shadowColor='rgba(0,0,0,.55)'; ctx.shadowBlur=32; ctx.shadowOffsetX=8; ctx.shadowOffsetY=16;
-  ctx.fillStyle='#000'; ctx.fillRect(fX,fY,fW,fH); ctx.restore();
-  await drawImgToCanvas(ctx,simSelected.image,fX,fY,fW,fH);
-
-  const url=canvas.toDataURL('image/png');
-  window._simUrl=url;
-  document.getElementById('sim-render-wrap').innerHTML=`<img src="${url}" class="render-img" alt="Simulação"/>`;
-}
-
-function drawImgToCanvas(ctx,url,x,y,w,h){
-  return new Promise(res=>{
-    const img=new Image(); img.crossOrigin='anonymous';
-    img.onload=()=>{ctx.drawImage(img,x,y,w,h);res();};
-    img.onerror=res; img.src=url;
-  });
+  // Pure HTML overlay — no canvas, no CORS
+  document.getElementById('sim-render-wrap').innerHTML = `
+    <div style="position:relative;width:100%;max-width:900px;margin:0 auto;line-height:0;">
+      <img src="${simEnv.image}" alt="${simEnv.name}" style="width:100%;display:block;"/>
+      <div style="position:absolute;top:50%;left:50%;transform:translate(-50%,-58%);
+                  width:18%;filter:drop-shadow(6px 14px 18px rgba(0,0,0,0.65));">
+        <img src="${simSelected.image}" alt="${simSelected.name}" style="width:100%;display:block;"/>
+      </div>
+    </div>`;
+  window._simEnvImg = simEnv.image;
+  window._simFrameImg = simSelected.image;
 }
 
 function simDownload(){
-  if(!window._simUrl) return;
-  const a=document.createElement('a'); a.href=window._simUrl;
-  a.download=`nhamat-simulacao-${simSelected?simSelected.id:'quadro'}.png`; a.click();
+  // Draw to canvas for download using blob URLs to avoid CORS
+  const wrap = document.getElementById('sim-render-wrap');
+  const envImg = wrap.querySelector('img');
+  const frameImg = wrap.querySelectorAll('img')[1];
+  if(!envImg||!frameImg){ showToast('Imagem não disponível para download.'); return; }
+
+  const canvas = document.getElementById('sim-canvas');
+  const W=900, H=Math.round(900*(envImg.naturalHeight/envImg.naturalWidth))||560;
+  canvas.width=W; canvas.height=H;
+  const ctx=canvas.getContext('2d');
+
+  // Draw env
+  ctx.drawImage(envImg,0,0,W,H);
+  // Draw frame centered
+  const fW=W*0.18, fH=fW*(frameImg.naturalHeight/frameImg.naturalWidth)||fW*1.33;
+  const fX=(W-fW)/2, fY=H*0.5-fH*0.58;
+  ctx.save();
+  ctx.shadowColor='rgba(0,0,0,0.55)'; ctx.shadowBlur=28; ctx.shadowOffsetX=5; ctx.shadowOffsetY=12;
+  ctx.drawImage(frameImg,fX,fY,fW,fH);
+  ctx.restore();
+
+  try{
+    const url=canvas.toDataURL('image/png');
+    const a=document.createElement('a'); a.href=url;
+    a.download=`nhamat-simulacao-${simSelected?simSelected.id:'quadro'}.png`; a.click();
+  }catch(e){
+    showToast('Para guardar: clique com o botão direito na imagem → Guardar imagem.');
+  }
 }
 
 // ═══════════════════════════════════════════════
