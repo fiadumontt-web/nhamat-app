@@ -522,7 +522,7 @@ footer{background:var(--dark);border-top:1px solid var(--border);margin-top:80px
       <div class="form-group"><label>Nome *</label><input id="f-name" placeholder="Ex: Aviador Clássico"/></div>
       <div class="form-group"><label>Categoria *</label><input id="f-cat" placeholder="Ex: Vintage"/></div>
       <div class="form-row">
-        <div class="form-group"><label>Preço *</label><input id="f-price" placeholder="Ex: 89Kz"/></div>
+        <div class="form-group"><label>Preço *</label><input id="f-price" placeholder="Ex: 89 Kz"/></div>
         <div class="form-group" id="f-dim-group"><label>Dimensões</label><input id="f-dim" placeholder="Ex: 60×80cm"/></div>
       </div>
       <div class="form-group">
@@ -588,20 +588,20 @@ const GLASS_COLORS = {
 };
 
 const DEFAULT_GLASSES = [
-  {id:'oculos-001',name:'Aviador Dourado',price:'89Kz',category:'Clássico',image:'images/glasses/oculos-001.svg',stock:true},
-  {id:'oculos-002',name:'Quadrado Urbano',price:'75Kz',category:'Moderno',image:'images/glasses/oculos-002.svg',stock:true},
-  {id:'oculos-003',name:'Cat-Eye Élégance',price:'110Kz',category:'Feminino',image:'images/glasses/oculos-003.svg',stock:true},
-  {id:'oculos-004',name:'Round Vintage',price:'95Kz',category:'Vintage',image:'images/glasses/oculos-004.svg',stock:true},
-  {id:'oculos-005',name:'Sport Titanium',price:'130Kz',category:'Desportivo',image:'images/glasses/oculos-005.svg',stock:true},
-  {id:'oculos-006',name:'Minimal Prata',price:'85Kz',category:'Minimalista',image:'images/glasses/oculos-006.svg',stock:true},
+  {id:'oculos-001',name:'Aviador Dourado',price:'89 Kz',category:'Clássico',image:'images/glasses/oculos-001.svg',stock:true},
+  {id:'oculos-002',name:'Quadrado Urbano',price:'75 Kz',category:'Moderno',image:'images/glasses/oculos-002.svg',stock:true},
+  {id:'oculos-003',name:'Cat-Eye Élégance',price:'110 Kz',category:'Feminino',image:'images/glasses/oculos-003.svg',stock:true},
+  {id:'oculos-004',name:'Round Vintage',price:'95 Kz',category:'Vintage',image:'images/glasses/oculos-004.svg',stock:true},
+  {id:'oculos-005',name:'Sport Titanium',price:'130 Kz',category:'Desportivo',image:'images/glasses/oculos-005.svg',stock:true},
+  {id:'oculos-006',name:'Minimal Prata',price:'85 Kz',category:'Minimalista',image:'images/glasses/oculos-006.svg',stock:true},
 ];
 const DEFAULT_FRAMES = [
-  {id:'quadro-001',name:'Abstrato Dourado',price:'180Kz',category:'Abstrato',dimensions:'60×80cm',image:'images/frames/quadro-001.svg',stock:true},
-  {id:'quadro-002',name:'Botânico Premium',price:'220Kz',category:'Natureza',dimensions:'50×70cm',image:'images/frames/quadro-002.svg',stock:true},
-  {id:'quadro-003',name:'Geométrico Azul',price:'160Kz',category:'Geométrico',dimensions:'60×60cm',image:'images/frames/quadro-003.svg',stock:true},
-  {id:'quadro-004',name:'Minimalista Negro',price:'195Kz',category:'Minimalista',dimensions:'40×60cm',image:'images/frames/quadro-004.svg',stock:true},
-  {id:'quadro-005',name:'Pôr do Sol',price:'240Kz',category:'Paisagem',dimensions:'80×60cm',image:'images/frames/quadro-005.svg',stock:true},
-  {id:'quadro-006',name:'Mapa de Lisboa',price:'210Kz',category:'Cidade',dimensions:'70×90cm',image:'images/frames/quadro-006.svg',stock:true},
+  {id:'quadro-001',name:'Abstrato Dourado',price:'180 Kz',category:'Abstrato',dimensions:'60×80cm',image:'images/frames/quadro-001.svg',stock:true},
+  {id:'quadro-002',name:'Botânico Premium',price:'220 Kz',category:'Natureza',dimensions:'50×70cm',image:'images/frames/quadro-002.svg',stock:true},
+  {id:'quadro-003',name:'Geométrico Azul',price:'160 Kz',category:'Geométrico',dimensions:'60×60cm',image:'images/frames/quadro-003.svg',stock:true},
+  {id:'quadro-004',name:'Minimalista Negro',price:'195 Kz',category:'Minimalista',dimensions:'40×60cm',image:'images/frames/quadro-004.svg',stock:true},
+  {id:'quadro-005',name:'Pôr do Sol',price:'240 Kz',category:'Paisagem',dimensions:'80×60cm',image:'images/frames/quadro-005.svg',stock:true},
+  {id:'quadro-006',name:'Mapa de Lisboa',price:'210 Kz',category:'Cidade',dimensions:'70×90cm',image:'images/frames/quadro-006.svg',stock:true},
 ];
 const WALL_ENVS = [
   {id:'parede-branca',name:'Parede Branca Lisa',image:'images/environments/parede-branca.svg'},
@@ -1173,7 +1173,7 @@ function saveProduct(){
   const cat=document.getElementById('f-cat').value.trim();
   const price=document.getElementById('f-price').value.trim();
   if(!name||!cat||!price){alert('Preencha nome, categoria e preço.');return;}
-  const priceF = price.includes('Kz')?price:price+'Kz';
+  const priceF = price.includes('Kz')?price:price+' Kz';
   const key = adminTab==='glasses'?'nhamat_glasses':'nhamat_frames';
   const prefix = adminTab==='glasses'?'OCU':'QUA';
   const fallback = adminTab==='glasses'?'images/glasses/oculos-001.svg':'images/frames/quadro-001.svg';
